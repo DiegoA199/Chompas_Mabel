@@ -25,7 +25,7 @@ import { AuthService } from '../core/services/auth.service';
       <div class="d-flex align-items-center gap-3">
         <i class="bi bi-bell fs-5 position-relative"><span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">6</span></i>
         <div class="avatar">{{iniciales()}}</div>
-        <div><strong>{{auth.currentUser()}}</strong><br><small class="text-muted">{{auth.currentRole()}}</small></div>
+        <div class="user-meta"><strong>{{auth.currentUser()}}</strong><br><small class="text-muted">{{auth.currentRole()}}</small></div>
         <button class="btn btn-sm btn-outline-secondary" (click)="auth.logout()">Salir</button>
       </div>
     </header>
