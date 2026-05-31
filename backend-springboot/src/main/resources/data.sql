@@ -1,0 +1,2 @@
+-- Los datos iniciales reales se cargan desde database/schema.sql.
+-- Spring SQL init queda desactivado para evitar duplicados al usar MySQL con Docker.
