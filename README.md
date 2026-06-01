@@ -14,12 +14,15 @@ Sistema web real para gestionar una empresa de chompas: login, dashboard, produc
 - Docker Desktop
 - Java 21
 - Maven 3.9+
-- Node.js 22+ y npm
+- Node.js 22+
+- npm
 
 ## Replicar en otra PC
 
 Sube este proyecto a GitHub y en la otra PC ejecuta:
+ se puede encontrar en el inicio del repositorio o puedes descargar el panel de desktop de git hub en tu computadora mas facil
 
+ 
 ```bash
 git clone URL_DEL_REPOSITORIO
 cd Chompas_Mabel_Real_Angular_SpringBoot
