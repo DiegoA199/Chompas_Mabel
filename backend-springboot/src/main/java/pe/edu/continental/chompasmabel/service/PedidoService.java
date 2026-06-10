@@ -61,6 +61,9 @@ public class PedidoService {
                 .estado(request.estado() != null ? request.estado() : Pedido.EstadoPedido.CONFIRMADO)
                 .metodoPago(limpiar(request.metodoPago()))
                 .total(BigDecimal.ZERO)
+                .montoPagado(BigDecimal.ZERO)
+                .saldoPendiente(BigDecimal.ZERO)
+                .estadoCredito(Pedido.EstadoCredito.SIN_CREDITO)
                 .detalles(new ArrayList<>())
                 .build();
 
@@ -72,6 +75,7 @@ public class PedidoService {
         }
 
         pedido.setTotal(total);
+        aplicarCredito(pedido, request.montoPagado(), request.fechaVencimientoCredito());
         if (generaVenta(pedido.getEstado())) {
             pedido.setVenta(Venta.builder()
                     .pedido(pedido)
@@ -81,6 +85,21 @@ public class PedidoService {
                     .build());
         }
 
+        return PedidoResponse.from(pedidoRepository.save(pedido));
+    }
+
+    @Transactional
+    public PedidoResponse marcarCreditoPagado(Long id) {
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado"));
+
+        if (pedido.getEstadoCredito() == Pedido.EstadoCredito.SIN_CREDITO) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El pedido no fue registrado a credito");
+        }
+
+        pedido.setMontoPagado(pedido.getTotal());
+        pedido.setSaldoPendiente(BigDecimal.ZERO);
+        pedido.setEstadoCredito(Pedido.EstadoCredito.PAGADO);
         return PedidoResponse.from(pedidoRepository.save(pedido));
     }
 
@@ -121,6 +140,41 @@ public class PedidoService {
         return estado == Pedido.EstadoPedido.CONFIRMADO
                 || estado == Pedido.EstadoPedido.EN_PROCESO
                 || estado == Pedido.EstadoPedido.ENTREGADO;
+    }
+
+    private void aplicarCredito(Pedido pedido, BigDecimal montoPagadoSolicitado, LocalDate fechaVencimientoSolicitada) {
+        if (!esCredito(pedido.getMetodoPago())) {
+            pedido.setMontoPagado(pedido.getTotal());
+            pedido.setSaldoPendiente(BigDecimal.ZERO);
+            pedido.setFechaVencimientoCredito(null);
+            pedido.setEstadoCredito(Pedido.EstadoCredito.SIN_CREDITO);
+            return;
+        }
+
+        BigDecimal montoPagado = montoPagadoSolicitado == null ? BigDecimal.ZERO : montoPagadoSolicitado;
+        if (montoPagado.compareTo(pedido.getTotal()) > 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El monto pagado no puede superar el total");
+        }
+
+        BigDecimal saldo = pedido.getTotal().subtract(montoPagado);
+        LocalDate vencimiento = fechaVencimientoSolicitada != null
+                ? fechaVencimientoSolicitada
+                : LocalDate.now().plusDays(15);
+
+        pedido.setMontoPagado(montoPagado);
+        pedido.setSaldoPendiente(saldo);
+        pedido.setFechaVencimientoCredito(vencimiento);
+        if (saldo.compareTo(BigDecimal.ZERO) == 0) {
+            pedido.setEstadoCredito(Pedido.EstadoCredito.PAGADO);
+        } else if (vencimiento.isBefore(LocalDate.now())) {
+            pedido.setEstadoCredito(Pedido.EstadoCredito.VENCIDO);
+        } else {
+            pedido.setEstadoCredito(Pedido.EstadoCredito.PENDIENTE);
+        }
+    }
+
+    private boolean esCredito(String metodoPago) {
+        return metodoPago != null && metodoPago.trim().equalsIgnoreCase("Credito");
     }
 
     private String resolverNumero(String numeroSolicitado) {

@@ -10,7 +10,7 @@ import { PedidoService } from '../../core/services/pedido.service';
   <div class="col-md-3"><div class="card-soft kpi"><div class="kpi-icon"><i class="bi bi-wallet2"></i></div><div><small>Ventas registradas</small><h3>{{pedidos.ventasDia()|currency:'PEN':'symbol':'1.2-2'}}</h3><span class="text-success">Conectado al API</span></div></div></div>
   <div class="col-md-3"><div class="card-soft kpi"><div class="kpi-icon"><i class="bi bi-clipboard-check"></i></div><div><small>Pedidos activos</small><h3>{{pedidos.activos()}}</h3><span class="text-success">{{pedidos.pedidos().length}} pedidos</span></div></div></div>
   <div class="col-md-3"><div class="card-soft kpi"><div class="kpi-icon"><i class="bi bi-box"></i></div><div><small>Productos</small><h3>{{productos.productos().length}}</h3><span class="text-danger">Stock bajo: {{productos.stockBajo().length}}</span></div></div></div>
-  <div class="col-md-3"><div class="card-soft kpi"><div class="kpi-icon"><i class="bi bi-cash"></i></div><div><small>Valor inventario</small><h3>{{productos.valorInventario()|currency:'PEN':'symbol':'1.2-2'}}</h3><span class="text-success">Actualizado</span></div></div></div>
+  <div class="col-md-3"><div class="card-soft kpi"><div class="kpi-icon"><i class="bi bi-hourglass-split"></i></div><div><small>Saldo a credito</small><h3>{{pedidos.saldoCredito()|currency:'PEN':'symbol':'1.2-2'}}</h3><span class="text-danger">Vencidos: {{pedidos.creditosVencidos().length}}</span></div></div></div>
 </div>
 <div class="row g-4">
   <div class="col-lg-8">
@@ -18,10 +18,10 @@ import { PedidoService } from '../../core/services/pedido.service';
       <h4>Pedidos recientes</h4>
       <div class="table-responsive">
         <table class="table table-hover">
-          <thead><tr><th>Pedido</th><th>Cliente</th><th>Total</th><th>Estado</th></tr></thead>
+          <thead><tr><th>Pedido</th><th>Cliente</th><th>Total</th><th>Credito</th><th>Estado</th></tr></thead>
           <tbody>
             @for(p of pedidos.pedidos().slice(0,5); track p.id){
-              <tr><td class="text-brand fw-bold">{{p.numero}}</td><td>{{p.cliente}}</td><td>{{p.total|currency:'PEN':'symbol':'1.2-2'}}</td><td><span class="badge bg-info">{{p.estado}}</span></td></tr>
+              <tr><td class="text-brand fw-bold">{{p.numero}}</td><td>{{p.cliente}}</td><td>{{p.total|currency:'PEN':'symbol':'1.2-2'}}</td><td>{{p.saldoPendiente|currency:'PEN':'symbol':'1.2-2'}}</td><td><span class="badge bg-info">{{p.estado}}</span></td></tr>
             }
           </tbody>
         </table>

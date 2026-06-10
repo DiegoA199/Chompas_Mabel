@@ -81,6 +81,25 @@ public class Pedido {
     private String metodoPago;
 
     @Builder.Default
+    @DecimalMin(value = "0.00", message = "El monto pagado debe ser mayor o igual a 0")
+    @Column(name = "monto_pagado", nullable = false, precision = 10, scale = 2)
+    private BigDecimal montoPagado = BigDecimal.ZERO;
+
+    @Builder.Default
+    @DecimalMin(value = "0.00", message = "El saldo pendiente debe ser mayor o igual a 0")
+    @Column(name = "saldo_pendiente", nullable = false, precision = 10, scale = 2)
+    private BigDecimal saldoPendiente = BigDecimal.ZERO;
+
+    @Column(name = "fecha_vencimiento_credito")
+    private LocalDate fechaVencimientoCredito;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "estado_credito", nullable = false, length = 30)
+    private EstadoCredito estadoCredito = EstadoCredito.SIN_CREDITO;
+
+    @Builder.Default
     @JsonIgnoreProperties("pedido")
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetallePedido> detalles = new ArrayList<>();
@@ -100,8 +119,17 @@ public class Pedido {
         if (total == null) {
             total = BigDecimal.ZERO;
         }
+        if (montoPagado == null) {
+            montoPagado = BigDecimal.ZERO;
+        }
+        if (saldoPendiente == null) {
+            saldoPendiente = BigDecimal.ZERO;
+        }
         if (estado == null) {
             estado = EstadoPedido.PENDIENTE;
+        }
+        if (estadoCredito == null) {
+            estadoCredito = EstadoCredito.SIN_CREDITO;
         }
     }
 
@@ -111,5 +139,12 @@ public class Pedido {
         EN_PROCESO,
         ENTREGADO,
         CANCELADO
+    }
+
+    public enum EstadoCredito {
+        SIN_CREDITO,
+        PENDIENTE,
+        VENCIDO,
+        PAGADO
     }
 }

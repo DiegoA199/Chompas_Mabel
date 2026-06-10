@@ -1,9 +1,11 @@
 package pe.edu.continental.chompasmabel.dto;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import pe.edu.continental.chompasmabel.model.Pedido;
@@ -24,6 +26,11 @@ public record PedidoRequest(
         LocalDate fechaEntrega,
 
         Pedido.EstadoPedido estado,
+
+        @DecimalMin(value = "0.00", message = "El monto pagado debe ser mayor o igual a 0")
+        BigDecimal montoPagado,
+
+        LocalDate fechaVencimientoCredito,
 
         @Valid
         @NotEmpty(message = "El pedido debe tener al menos un detalle")

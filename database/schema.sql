@@ -70,11 +70,17 @@ CREATE TABLE pedidos (
   total DECIMAL(10,2) NOT NULL DEFAULT 0,
   estado VARCHAR(30) NOT NULL DEFAULT 'PENDIENTE',
   metodo_pago VARCHAR(50),
+  monto_pagado DECIMAL(10,2) NOT NULL DEFAULT 0,
+  saldo_pendiente DECIMAL(10,2) NOT NULL DEFAULT 0,
+  fecha_vencimiento_credito DATE,
+  estado_credito VARCHAR(30) NOT NULL DEFAULT 'SIN_CREDITO',
   CONSTRAINT fk_pedido_cliente
     FOREIGN KEY (id_cliente) REFERENCES clientes(id),
   CONSTRAINT fk_pedido_usuario
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id),
-  CHECK (total >= 0)
+  CHECK (total >= 0),
+  CHECK (monto_pagado >= 0),
+  CHECK (saldo_pendiente >= 0)
 ) ENGINE=InnoDB;
 
 CREATE TABLE detalle_pedido (
@@ -141,21 +147,27 @@ INSERT INTO productos (id, codigo, nombre, descripcion, id_categoria, talla, col
   (5, 'CHP-005', 'Chompa Corporativa Bordada', 'Produccion por lote con logo bordado', 5, 'S-M-L-XL', 'Gris', 180.00, 12, 'ACTIVO'),
   (6, 'CHP-006', 'Chompa Infantil Termica', 'Tejido termico para ninos', 2, '8-10-12', 'Rojo', 89.00, 4, 'STOCK_BAJO');
 
-INSERT INTO pedidos (id, numero, id_cliente, id_usuario, fecha_pedido, fecha_entrega, total, estado, metodo_pago) VALUES
-  (1, 'PED-2026-0001', 1, 2, '2026-05-28 10:15:00', '2026-05-30', 588.00, 'CONFIRMADO', 'Yape'),
-  (2, 'PED-2026-0002', 3, 2, '2026-05-29 09:45:00', '2026-06-02', 1275.00, 'EN_PROCESO', 'Transferencia'),
-  (3, 'PED-2026-0003', 2, 1, '2026-05-29 18:30:00', '2026-06-01', 420.00, 'PENDIENTE', 'Efectivo');
+INSERT INTO pedidos (id, numero, id_cliente, id_usuario, fecha_pedido, fecha_entrega, total, estado, metodo_pago, monto_pagado, saldo_pendiente, fecha_vencimiento_credito, estado_credito) VALUES
+  (1, 'PED-2026-0001', 1, 2, '2026-05-28 10:15:00', '2026-05-30', 588.00, 'CONFIRMADO', 'Yape', 588.00, 0.00, NULL, 'SIN_CREDITO'),
+  (2, 'PED-2026-0002', 3, 2, '2026-05-29 09:45:00', '2026-06-02', 1275.00, 'EN_PROCESO', 'Transferencia', 1275.00, 0.00, NULL, 'SIN_CREDITO'),
+  (3, 'PED-2026-0003', 2, 1, '2026-05-29 18:30:00', '2026-06-01', 420.00, 'PENDIENTE', 'Efectivo', 0.00, 0.00, NULL, 'SIN_CREDITO'),
+  (4, 'PED-2026-0004', 4, 2, '2026-06-04 11:20:00', '2026-06-07', 267.00, 'CONFIRMADO', 'Credito', 50.00, 217.00, '2026-06-09', 'VENCIDO'),
+  (5, 'PED-2026-0005', 1, 2, '2026-06-06 16:05:00', '2026-06-09', 250.00, 'EN_PROCESO', 'Credito', 0.00, 250.00, '2026-06-18', 'PENDIENTE');
 
 INSERT INTO detalle_pedido (id, id_pedido, id_producto, cantidad, precio_unitario, subtotal) VALUES
   (1, 1, 1, 2, 245.00, 490.00),
   (2, 1, 2, 1, 98.00, 98.00),
   (3, 2, 5, 5, 180.00, 900.00),
   (4, 2, 3, 3, 125.00, 375.00),
-  (5, 3, 4, 1, 420.00, 420.00);
+  (5, 3, 4, 1, 420.00, 420.00),
+  (6, 4, 6, 3, 89.00, 267.00),
+  (7, 5, 3, 2, 125.00, 250.00);
 
 INSERT INTO ventas (id, id_pedido, fecha_venta, monto_total, tipo_comprobante) VALUES
   (1, 1, '2026-05-28 10:20:00', 588.00, 'BOLETA'),
-  (2, 2, '2026-05-29 09:55:00', 1275.00, 'FACTURA');
+  (2, 2, '2026-05-29 09:55:00', 1275.00, 'FACTURA'),
+  (3, 4, '2026-06-04 11:25:00', 267.00, 'BOLETA_CREDITO'),
+  (4, 5, '2026-06-06 16:10:00', 250.00, 'BOLETA_CREDITO');
 
 INSERT INTO inventario_movimientos (id, id_producto, tipo_movimiento, cantidad, fecha_movimiento, observacion) VALUES
   (1, 1, 'ENTRADA', 30, '2026-05-20 08:00:00', 'Stock inicial'),
@@ -168,4 +180,6 @@ INSERT INTO inventario_movimientos (id, id_producto, tipo_movimiento, cantidad, 
   (8, 2, 'SALIDA', 1, '2026-05-28 10:15:00', 'Salida por pedido PED-2026-0001'),
   (9, 5, 'SALIDA', 5, '2026-05-29 09:45:00', 'Salida por pedido PED-2026-0002'),
   (10, 3, 'SALIDA', 3, '2026-05-29 09:45:00', 'Salida por pedido PED-2026-0002'),
-  (11, 4, 'SALIDA', 1, '2026-05-29 18:30:00', 'Reserva por pedido PED-2026-0003');
+  (11, 4, 'SALIDA', 1, '2026-05-29 18:30:00', 'Reserva por pedido PED-2026-0003'),
+  (12, 6, 'SALIDA', 3, '2026-06-04 11:20:00', 'Salida por pedido a credito PED-2026-0004'),
+  (13, 3, 'SALIDA', 2, '2026-06-06 16:05:00', 'Salida por pedido a credito PED-2026-0005');

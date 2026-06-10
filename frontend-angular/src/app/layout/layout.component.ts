@@ -40,6 +40,7 @@ export class LayoutComponent {
     {label:'Pedidos',path:'/pedidos',icon:'bi-clipboard-check'},
     {label:'Clientes',path:'/clientes',icon:'bi-people'},
     {label:'Ventas',path:'/ventas',icon:'bi-cart4'},
+    {label:'Creditos',path:'/creditos',icon:'bi-credit-card'},
     {label:'Reportes',path:'/reportes',icon:'bi-bar-chart'}
   ];
 

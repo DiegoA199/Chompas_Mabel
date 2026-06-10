@@ -18,6 +18,8 @@ import { ProductoService } from '../../core/services/producto.service';
 <div class="row g-4 mb-4">
   <div class="col-md-3"><div class="card-soft kpi"><div class="kpi-icon"><i class="bi bi-clipboard"></i></div><div><small>Pedidos</small><h3>{{service.pedidos().length}}</h3></div></div></div>
   <div class="col-md-3"><div class="card-soft kpi"><div class="kpi-icon"><i class="bi bi-wallet"></i></div><div><small>Ventas registradas</small><h3>{{service.ventasDia()|currency:'PEN':'symbol':'1.2-2'}}</h3></div></div></div>
+  <div class="col-md-3"><div class="card-soft kpi"><div class="kpi-icon"><i class="bi bi-hourglass-split"></i></div><div><small>Saldo a credito</small><h3>{{service.saldoCredito()|currency:'PEN':'symbol':'1.2-2'}}</h3></div></div></div>
+  <div class="col-md-3"><div class="card-soft kpi"><div class="kpi-icon"><i class="bi bi-exclamation-triangle"></i></div><div><small>Creditos vencidos</small><h3>{{service.creditosVencidos().length}}</h3></div></div></div>
 </div>
 
 <form [formGroup]="form" (ngSubmit)="guardar()" class="card-soft p-4 mb-4">
@@ -55,6 +57,7 @@ import { ProductoService } from '../../core/services/producto.service';
         <option value="Yape">Yape</option>
         <option value="Transferencia">Transferencia</option>
         <option value="Tarjeta">Tarjeta</option>
+        <option value="Credito">Credito</option>
       </select>
     </div>
     <div class="col-md-2">
@@ -67,6 +70,24 @@ import { ProductoService } from '../../core/services/producto.service';
       <button class="btn btn-brand w-100" [disabled]="form.invalid || guardando()">Guardar</button>
     </div>
   </div>
+  @if(esCredito()){
+    <div class="row g-3 mt-1">
+      <div class="col-md-3">
+        <label class="form-label">Monto pagado ahora</label>
+        <input type="number" class="form-control" formControlName="montoPagado">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Vence el credito</label>
+        <input type="date" class="form-control" formControlName="fechaVencimientoCredito">
+      </div>
+      <div class="col-md-6 d-flex align-items-end">
+        <div class="alert alert-light border w-100 mb-0">
+          Total estimado: <strong>{{totalEstimado()|currency:'PEN':'symbol':'1.2-2'}}</strong> -
+          Saldo pendiente: <strong>{{saldoEstimado()|currency:'PEN':'symbol':'1.2-2'}}</strong>
+        </div>
+      </div>
+    </div>
+  }
 </form>
 
 <div class="card-soft p-4">
@@ -76,7 +97,7 @@ import { ProductoService } from '../../core/services/producto.service';
   </ul>
   <div class="table-responsive">
     <table class="table table-hover">
-      <thead><tr><th>Nro Pedido</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Estado</th><th>Metodo de pago</th><th>Entrega</th><th>Venta</th></tr></thead>
+      <thead><tr><th>Nro Pedido</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Estado</th><th>Metodo de pago</th><th>Credito</th><th>Entrega</th><th>Venta</th></tr></thead>
       <tbody>
         @for(p of service.pedidos(); track p.id){
           <tr>
@@ -86,6 +107,15 @@ import { ProductoService } from '../../core/services/producto.service';
             <td>{{p.total|currency:'PEN':'symbol':'1.2-2'}}</td>
             <td><span class="badge bg-info">{{p.estado}}</span></td>
             <td>{{p.metodoPago}}</td>
+            <td>
+              @if(p.estadoCredito !== 'SIN_CREDITO'){
+                <span class="badge" [class.bg-danger]="p.creditoVencido" [class.bg-warning]="!p.creditoVencido && p.saldoPendiente > 0" [class.bg-success]="p.saldoPendiente === 0">
+                  {{p.saldoPendiente|currency:'PEN':'symbol':'1.2-2'}}
+                </span>
+              } @else {
+                <span class="text-muted">No aplica</span>
+              }
+            </td>
             <td>{{p.fechaEntrega|date:'mediumDate'}}</td>
             <td>{{p.ventaId ? 'Generada' : 'Pendiente'}}</td>
           </tr>
@@ -104,6 +134,8 @@ export class PedidosComponent implements OnInit {
     productoId: [0, [Validators.required, Validators.min(1)]],
     cantidad: [1, [Validators.required, Validators.min(1)]],
     metodoPago: ['Yape', [Validators.required]],
+    montoPagado: [0, [Validators.min(0)]],
+    fechaVencimientoCredito: [''],
     estado: this.fb.control<EstadoPedido>('CONFIRMADO', {validators: [Validators.required]})
   });
 
@@ -132,6 +164,8 @@ export class PedidosComponent implements OnInit {
       usuarioId: 1,
       metodoPago: raw.metodoPago,
       estado: raw.estado,
+      montoPagado: raw.metodoPago === 'Credito' ? raw.montoPagado : null,
+      fechaVencimientoCredito: raw.metodoPago === 'Credito' && raw.fechaVencimientoCredito ? raw.fechaVencimientoCredito : null,
       detalles: [{productoId: raw.productoId, cantidad: raw.cantidad}]
     };
 
@@ -140,10 +174,24 @@ export class PedidosComponent implements OnInit {
     this.service.crear(payload).subscribe({
       next: () => {
         this.productos.cargarDesdeApi();
-        this.form.reset({clienteId:0, productoId:0, cantidad:1, metodoPago:'Yape', estado:'CONFIRMADO'});
+        this.form.reset({clienteId:0, productoId:0, cantidad:1, metodoPago:'Yape', montoPagado:0, fechaVencimientoCredito:'', estado:'CONFIRMADO'});
       },
       error: () => this.errorFormulario.set('No se pudo registrar el pedido. Revisa cliente, producto y stock disponible.'),
       complete: () => this.guardando.set(false)
     });
+  }
+
+  esCredito(): boolean {
+    return this.form.controls.metodoPago.value === 'Credito';
+  }
+
+  totalEstimado(): number {
+    const raw = this.form.getRawValue();
+    const producto = this.productos.productos().find(item => item.id === raw.productoId);
+    return producto ? producto.precio * raw.cantidad : 0;
+  }
+
+  saldoEstimado(): number {
+    return Math.max(this.totalEstimado() - this.form.controls.montoPagado.value, 0);
   }
 }
