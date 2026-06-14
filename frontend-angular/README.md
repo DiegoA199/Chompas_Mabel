@@ -2,6 +2,11 @@
 
 Aplicacion web SPA construida con Angular 21 para los modulos de login, dashboard, productos, clientes, pedidos/ventas, creditos y reportes.
 
+El frontend separa el flujo por rol:
+
+- `ADMIN`: ve inventario, reportes y acciones de mantenimiento.
+- `VENDEDOR`: ve operacion diaria, catalogo de consulta, clientes, pedidos, ventas y creditos.
+
 ## Estructura
 
 ```text
@@ -38,3 +43,5 @@ Abrir `http://localhost:4200`.
 Los servicios HTTP estan en `src/app/core/services` y consumen el backend Spring Boot en `http://localhost:8080/api`.
 
 El modulo de creditos usa `PedidoService` para listar pedidos a credito, mostrar saldos vencidos y marcar una cuenta como pagada.
+
+La campana de notificaciones se calcula con datos reales de `PedidoService` y `ProductoService`.

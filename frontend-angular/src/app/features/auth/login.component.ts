@@ -46,6 +46,10 @@ import { AuthService } from '../../core/services/auth.service';
         <strong>Credenciales de demostracion</strong><br>
         Administrador: admin@chompasmabel.com / admin123<br>
         Vendedor: vendedor@chompasmabel.com / venta123
+        <div class="d-flex gap-2 mt-3">
+          <button type="button" class="btn btn-sm btn-outline-danger" (click)="usarAdmin()">Usar Admin</button>
+          <button type="button" class="btn btn-sm btn-outline-secondary" (click)="usarVendedor()">Usar Vendedor</button>
+        </div>
       </div>
     </div>
   </section>
@@ -61,6 +65,14 @@ export class LoginComponent {
   });
 
   constructor(private fb: NonNullableFormBuilder, private auth: AuthService) {}
+
+  usarAdmin(): void {
+    this.form.patchValue({email: 'admin@chompasmabel.com', password: 'admin123'});
+  }
+
+  usarVendedor(): void {
+    this.form.patchValue({email: 'vendedor@chompasmabel.com', password: 'venta123'});
+  }
 
   submit(): void {
     if (this.form.invalid) {

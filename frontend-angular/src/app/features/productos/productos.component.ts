@@ -3,11 +3,14 @@ import { CurrencyPipe } from '@angular/common';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Producto, ProductoPayload } from '../../core/models/producto.model';
 import { ProductoService } from '../../core/services/producto.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({selector:'app-productos',standalone:true,imports:[ReactiveFormsModule,CurrencyPipe],template:`
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <div><h1 class="fw-bold">Gestion de productos e inventario</h1><p class="text-muted">Catalogo, stock y valorizacion del inventario.</p></div>
-  <button class="btn btn-brand" data-bs-toggle="collapse" data-bs-target="#formProducto"><i class="bi bi-plus"></i> Nuevo producto</button>
+  <div><h1 class="fw-bold">{{auth.isAdmin() ? 'Gestion de productos e inventario' : 'Catalogo de productos'}}</h1><p class="text-muted">{{auth.isAdmin() ? 'Catalogo, stock y valorizacion del inventario.' : 'Consulta de precios y stock disponible para ventas.'}}</p></div>
+  @if(auth.isAdmin()){
+    <button class="btn btn-brand" data-bs-toggle="collapse" data-bs-target="#formProducto"><i class="bi bi-plus"></i> Nuevo producto</button>
+  }
 </div>
 
 @if(service.error()){
@@ -20,6 +23,7 @@ import { ProductoService } from '../../core/services/producto.service';
   <div class="col-md-4"><div class="card-soft kpi"><div class="kpi-icon"><i class="bi bi-cash"></i></div><div><small>Valorizacion</small><h3>{{service.valorInventario()|currency:'PEN':'symbol':'1.2-2'}}</h3></div></div></div>
 </div>
 
+@if(auth.isAdmin()){
 <div id="formProducto" class="collapse show">
   <form [formGroup]="form" (ngSubmit)="guardar()" class="card-soft p-4 mb-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -75,12 +79,15 @@ import { ProductoService } from '../../core/services/producto.service';
     </div>
   </form>
 </div>
+} @else {
+  <div class="alert alert-light border mb-4">Modo consulta de catalogo. Inventario reservado a ADMIN.</div>
+}
 
 <div class="card-soft p-4">
   <div class="d-flex justify-content-between mb-3"><h4>Listado de productos</h4></div>
   <div class="table-responsive">
     <table class="table table-hover">
-      <thead><tr><th>Codigo</th><th>Producto</th><th>Categoria</th><th>Talla</th><th>Color</th><th>Stock</th><th>Precio</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <thead><tr><th>Codigo</th><th>Producto</th><th>Categoria</th><th>Talla</th><th>Color</th><th>Stock</th><th>Precio</th><th>Estado</th>@if(auth.isAdmin()){<th>Acciones</th>}</tr></thead>
       <tbody>
         @for(p of service.productos(); track p.id){
           <tr>
@@ -92,10 +99,12 @@ import { ProductoService } from '../../core/services/producto.service';
             <td [class.text-danger]="p.stock<=10">{{p.stock}}</td>
             <td>{{p.precio|currency:'PEN':'symbol':'1.2-2'}}</td>
             <td><span class="badge" [class.bg-success]="p.stock>10" [class.bg-warning]="p.stock<=10">{{p.stock<=10?'Stock bajo':'Activo'}}</span></td>
-            <td>
-              <button class="btn btn-sm btn-outline-secondary me-2" type="button" (click)="editar(p)"><i class="bi bi-pencil"></i></button>
-              <button class="btn btn-sm btn-outline-danger" type="button" (click)="eliminar(p)"><i class="bi bi-trash"></i></button>
-            </td>
+            @if(auth.isAdmin()){
+              <td>
+                <button class="btn btn-sm btn-outline-secondary me-2" type="button" (click)="editar(p)"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger" type="button" (click)="eliminar(p)"><i class="bi bi-trash"></i></button>
+              </td>
+            }
           </tr>
         }
       </tbody>
@@ -119,7 +128,7 @@ export class ProductosComponent implements OnInit {
     stock: [0, [Validators.required, Validators.min(0)]]
   });
 
-  constructor(public service: ProductoService, private fb: NonNullableFormBuilder) {}
+  constructor(public service: ProductoService, private fb: NonNullableFormBuilder, public auth: AuthService) {}
 
   ngOnInit(): void {
     this.service.cargarDesdeApi();

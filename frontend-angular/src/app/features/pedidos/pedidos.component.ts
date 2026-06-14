@@ -2,13 +2,14 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { EstadoPedido, PedidoPayload } from '../../core/models/pedido.model';
+import { AuthService } from '../../core/services/auth.service';
 import { ClienteService } from '../../core/services/cliente.service';
 import { PedidoService } from '../../core/services/pedido.service';
 import { ProductoService } from '../../core/services/producto.service';
 
 @Component({selector:'app-pedidos',standalone:true,imports:[ReactiveFormsModule,CurrencyPipe,DatePipe],template:`
 <div class="d-flex justify-content-between mb-4">
-  <div><h1 class="fw-bold">Gestion de pedidos y ventas</h1><p class="text-muted">Seguimiento de pedidos, ventas y entregas.</p></div>
+  <div><h1 class="fw-bold">{{auth.isAdmin() ? 'Gestion de pedidos y ventas' : 'Panel de ventas'}}</h1><p class="text-muted">{{auth.isAdmin() ? 'Seguimiento de pedidos, ventas y entregas.' : 'Registra clientes, pedidos y ventas del dia.'}}</p></div>
 </div>
 
 @if(service.error()){
@@ -143,6 +144,7 @@ export class PedidosComponent implements OnInit {
     public service: PedidoService,
     public clientes: ClienteService,
     public productos: ProductoService,
+    public auth: AuthService,
     private fb: NonNullableFormBuilder
   ) {}
 
@@ -161,7 +163,7 @@ export class PedidosComponent implements OnInit {
     const raw = this.form.getRawValue();
     const payload: PedidoPayload = {
       clienteId: raw.clienteId,
-      usuarioId: 1,
+      usuarioId: this.auth.currentUserId(),
       metodoPago: raw.metodoPago,
       estado: raw.estado,
       montoPagado: raw.metodoPago === 'Credito' ? raw.montoPagado : null,

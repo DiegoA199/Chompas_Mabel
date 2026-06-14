@@ -27,6 +27,6 @@ public class AuthController {
                 .filter(u -> u.getPassword().equals(request.password()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciales invalidas"));
 
-        return new AuthResponse("demo-token-springboot", usuario.getNombre(), usuario.getRol());
+        return new AuthResponse("demo-token-springboot", usuario.getId(), usuario.getNombre(), usuario.getRol());
     }
 }

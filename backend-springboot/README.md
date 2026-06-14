@@ -2,6 +2,8 @@
 
 API REST construida con Java 21 y Spring Boot para productos, clientes, pedidos, ventas, creditos, inventario y autenticacion demo.
 
+La autenticacion demo devuelve el identificador del usuario y su rol (`ADMIN` o `VENDEDOR`) para que el frontend adapte menu, permisos y flujo de trabajo.
+
 ## Estructura
 
 ```text

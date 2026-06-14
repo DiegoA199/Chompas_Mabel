@@ -2,14 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { ProductoService } from '../../core/services/producto.service';
 import { PedidoService } from '../../core/services/pedido.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({selector:'app-dashboard',standalone:true,imports:[CurrencyPipe],template:`
-<h1 class="fw-bold">Dashboard ejecutivo</h1>
-<p class="text-muted">Resumen operativo de Chompas Mabel.</p>
+<h1 class="fw-bold">{{auth.isAdmin() ? 'Dashboard administrativo' : 'Dashboard de vendedor'}}</h1>
+<p class="text-muted">{{auth.isAdmin() ? 'Resumen general para decisiones de inventario, ventas y creditos.' : 'Resumen diario para registrar ventas, clientes y creditos pendientes.'}}</p>
 <div class="row g-4 mb-4">
   <div class="col-md-3"><div class="card-soft kpi"><div class="kpi-icon"><i class="bi bi-wallet2"></i></div><div><small>Ventas registradas</small><h3>{{pedidos.ventasDia()|currency:'PEN':'symbol':'1.2-2'}}</h3><span class="text-success">Conectado al API</span></div></div></div>
   <div class="col-md-3"><div class="card-soft kpi"><div class="kpi-icon"><i class="bi bi-clipboard-check"></i></div><div><small>Pedidos activos</small><h3>{{pedidos.activos()}}</h3><span class="text-success">{{pedidos.pedidos().length}} pedidos</span></div></div></div>
-  <div class="col-md-3"><div class="card-soft kpi"><div class="kpi-icon"><i class="bi bi-box"></i></div><div><small>Productos</small><h3>{{productos.productos().length}}</h3><span class="text-danger">Stock bajo: {{productos.stockBajo().length}}</span></div></div></div>
+  <div class="col-md-3"><div class="card-soft kpi"><div class="kpi-icon"><i class="bi bi-box"></i></div><div><small>{{auth.isAdmin() ? 'Productos' : 'Catalogo'}}</small><h3>{{productos.productos().length}}</h3><span class="text-danger">Stock bajo: {{productos.stockBajo().length}}</span></div></div></div>
   <div class="col-md-3"><div class="card-soft kpi"><div class="kpi-icon"><i class="bi bi-hourglass-split"></i></div><div><small>Saldo a credito</small><h3>{{pedidos.saldoCredito()|currency:'PEN':'symbol':'1.2-2'}}</h3><span class="text-danger">Vencidos: {{pedidos.creditosVencidos().length}}</span></div></div></div>
 </div>
 <div class="row g-4">
@@ -44,7 +45,7 @@ import { PedidoService } from '../../core/services/pedido.service';
   </div>
 </div>`})
 export class DashboardComponent implements OnInit {
-  constructor(public productos: ProductoService, public pedidos: PedidoService) {}
+  constructor(public productos: ProductoService, public pedidos: PedidoService, public auth: AuthService) {}
 
   ngOnInit(): void {
     this.productos.cargarDesdeApi();

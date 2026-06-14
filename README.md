@@ -121,6 +121,13 @@ El frontend se ejecuta con Angular CLI desde `frontend-angular`.
 - Administrador: `admin@chompasmabel.com` / `admin123`
 - Vendedor: `vendedor@chompasmabel.com` / `venta123`
 
+## Flujo por rol
+
+- Administrador: dashboard administrativo, mantenimiento de productos, inventario, clientes, pedidos, ventas, creditos, reportes y notificaciones de stock bajo.
+- Vendedor: dashboard operativo, consulta de catalogo, registro de clientes, pedidos, ventas, creditos y notificaciones de pedidos/creditos.
+
+Los requerimientos de usuario estan documentados en `docs/requerimientos_usuario.md`.
+
 ## API principal
 
 - `POST http://localhost:8080/api/auth/login`
@@ -148,6 +155,8 @@ Las tablas reales del script son `usuarios`, `clientes`, `categorias`, `producto
 
 La tabla `pedidos` tambien guarda datos de credito: `monto_pagado`, `saldo_pendiente`, `fecha_vencimiento_credito` y `estado_credito`. Con eso se puede saber que cliente llevo productos a credito, cuanto debe, cuando vence y si el saldo ya fue pagado.
 
+El script completo de base de datos esta en `database/schema.sql` e incluye datos iniciales para probar administrador, vendedor, productos, clientes, pedidos, ventas, inventario y creditos.
+
 ## Replicar en otra PC
 
 El enlace del repositorio se puede copiar desde GitHub o descargar usando GitHub Desktop.
@@ -167,3 +176,4 @@ Luego ejecuta el backend y frontend con los comandos anteriores. No subas `node_
 - El backend valida payloads con `jakarta.validation` y responde errores JSON desde `ApiExceptionHandler`.
 - Al registrar un pedido, el backend calcula subtotales, total, descuenta stock, registra movimientos de inventario y genera venta cuando el estado corresponde.
 - Si el metodo de pago es `Credito`, el backend calcula saldo pendiente, fecha de vencimiento y estado `PENDIENTE`, `VENCIDO` o `PAGADO`.
+- La campana de notificaciones calcula alertas reales segun creditos vencidos, pedidos pendientes y stock bajo.

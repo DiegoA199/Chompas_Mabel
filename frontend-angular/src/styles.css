@@ -172,6 +172,50 @@ body {
   font-weight: 700;
 }
 
+.notification-wrapper {
+  position: relative;
+}
+
+.notification-button {
+  position: relative;
+  border: 0;
+  background: transparent;
+  color: #111827;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+}
+
+.notification-panel {
+  position: absolute;
+  right: 0;
+  top: 52px;
+  width: min(360px, calc(100vw - 32px));
+  padding: 16px;
+  z-index: 30;
+}
+
+.notification-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  color: inherit;
+  text-decoration: none;
+  border-top: 1px solid #eef0f5;
+}
+
+.notification-item i {
+  color: var(--brand);
+  font-size: 1.15rem;
+}
+
+.notification-item small {
+  display: block;
+  color: var(--muted);
+}
+
 @media (max-width: 992px) {
   .sidebar {
     width: 88px;
