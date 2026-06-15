@@ -80,4 +80,4 @@ La explicacion paso a paso para replicar la base de datos esta en `docs/replicar
 
 ## Backend de evaluacion
 
-Para cumplir la rubrica, el backend principal esta en `backend-fastapi` y expone la API REST con FastAPI en `http://localhost:8000/api`. El proyecto conserva `backend-springboot` como implementacion alternativa y referencia de la arquitectura anterior.
+El backend principal esta en `backend-fastapi` y expone la API REST con FastAPI en `http://localhost:8000/api`. El proyecto conserva `backend-springboot` como implementacion alternativa y referencia tecnica.

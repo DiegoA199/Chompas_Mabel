@@ -5,7 +5,7 @@ Sistema web para administrar una empresa de chompas: login, dashboard, productos
 ## Tecnologias
 
 - Frontend: Angular 21, TypeScript, Bootstrap 5, Bootstrap Icons, CSS propio, routing, servicios HTTP, formularios reactivos y signals para estados de interfaz.
-- Backend principal para rubrica: FastAPI, Uvicorn, MySQL Connector, endpoints REST y procedimientos almacenados.
+- Backend principal: FastAPI, Uvicorn, MySQL Connector, endpoints REST y procedimientos almacenados.
 - Backend alternativo: Java 21, Spring Boot 3, Spring Web, Spring Data JPA, Spring Security, Hibernate, validaciones con `jakarta.validation`, controladores REST, servicios, repositorios, DTOs y modelos JPA.
 - Base de datos: MySQL 8.4 con script reproducible en `database/schema.sql`, relaciones, restricciones y procedimientos almacenados.
 - Docker: `docker-compose.yml` levanta MySQL, backend FastAPI y tambien puede construir el backend Spring Boot.
@@ -242,7 +242,7 @@ Para pasos detallados con MySQL Workbench, XAMPP/phpMyAdmin, consola MySQL y Doc
 ## Notas de implementacion
 
 - El frontend consume el backend mediante servicios HTTP en `src/app/core/services`.
-- El backend principal FastAPI esta en `backend-fastapi` y expone los endpoints requeridos por la rubrica.
+- El backend principal FastAPI esta en `backend-fastapi` y expone los endpoints del sistema.
 - La pantalla de productos cambia segun rol: administrador edita catalogo/productos y vendedor ve un catalogo responsive con imagenes, filtros, tallas, colores, precios y stock.
 - La ruta `/inventario` usa un componente dedicado para movimientos de inventario y la ruta `/ventas` usa un componente dedicado para historial de ventas cerradas.
 - La barra de busqueda superior filtra en tiempo real productos, pedidos, clientes, creditos, ventas e inventario segun la vista activa.

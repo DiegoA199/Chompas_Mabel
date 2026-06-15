@@ -142,7 +142,7 @@ WHERE metodo_pago = 'Credito';
 
 ## Paso 4: Conectar el backend
 
-El backend principal para la rubrica esta en `backend-fastapi` y ya esta configurado para conectarse a MySQL local con estos datos:
+El backend principal esta en `backend-fastapi` y ya esta configurado para conectarse a MySQL local con estos datos:
 
 ```text
 Host: localhost
