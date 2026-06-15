@@ -154,7 +154,7 @@ El frontend se ejecuta con Angular CLI desde `frontend-angular`.
 ## Flujo por rol
 
 - Administrador: dashboard administrativo, mantenimiento de productos, inventario, clientes, pedidos, ventas, creditos, reportes y notificaciones de stock bajo.
-- Vendedor: dashboard operativo, consulta de catalogo, registro de clientes, pedidos, ventas, creditos y notificaciones de pedidos/creditos.
+- Vendedor: dashboard operativo, catalogo visual de chompas para atencion al cliente, registro de clientes, pedidos, ventas, creditos y notificaciones de pedidos/creditos.
 
 Los requerimientos de usuario estan documentados en `docs/requerimientos_usuario.md`.
 
@@ -219,6 +219,7 @@ Para pasos detallados con MySQL Workbench, XAMPP/phpMyAdmin, consola MySQL y Doc
 ## Notas de implementacion
 
 - El frontend consume el backend mediante servicios HTTP en `src/app/core/services`.
+- La pantalla de productos cambia segun rol: administrador edita inventario y vendedor ve un catalogo responsive con imagenes, filtros, tallas, colores, precios y stock.
 - Los formularios validan campos obligatorios, correo valido, precio y stock mayores o iguales a 0, cantidad mayor a 0 y nombre minimo de 3 caracteres.
 - El backend valida payloads con `jakarta.validation` y responde errores JSON desde `ApiExceptionHandler`.
 - Al registrar un pedido, el backend calcula subtotales, total, descuenta stock, registra movimientos de inventario y genera venta cuando el estado corresponde.

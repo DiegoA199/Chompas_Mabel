@@ -33,7 +33,7 @@ Requerimientos:
 
 - Iniciar sesion con rol `VENDEDOR`.
 - Ver un dashboard operativo enfocado en pedidos, ventas y creditos.
-- Consultar productos, precios y stock disponible sin editar inventario.
+- Consultar un catalogo visual de chompas con modelos, categoria, talla, color, precio y stock disponible sin editar inventario.
 - Registrar clientes.
 - Registrar pedidos, ventas y pedidos a credito.
 - Consultar creditos pendientes o vencidos.
@@ -43,7 +43,7 @@ Requerimientos:
 Flujo principal:
 
 1. Ingresa al sistema como vendedor.
-2. Consulta productos y stock disponible.
+2. Abre el catalogo para mostrar al cliente la variedad de chompas disponibles.
 3. Registra o busca al cliente.
 4. Crea el pedido como venta directa o venta a credito.
 5. Si el cliente paga una deuda, marca el credito como pagado.
@@ -53,7 +53,7 @@ Flujo principal:
 - Un usuario tiene un rol: `ADMIN` o `VENDEDOR`.
 - Solo el administrador puede acceder a inventario y reportes generales.
 - Solo el administrador puede crear, editar o eliminar productos.
-- El vendedor puede consultar productos para vender, pero no modificar inventario.
+- El vendedor puede consultar productos en modo catalogo para vender, pero no modificar inventario.
 - Si el metodo de pago es `Credito`, el sistema registra monto pagado, saldo pendiente, fecha de vencimiento y estado del credito.
 - Un credito se muestra como vencido si tiene saldo pendiente y su fecha de vencimiento ya paso.
 - La campana de notificaciones muestra alertas reales del sistema.

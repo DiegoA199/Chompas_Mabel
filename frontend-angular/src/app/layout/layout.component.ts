@@ -83,7 +83,9 @@ export class LayoutComponent implements OnInit {
 
   menuVisible(): MenuItem[] {
     const rol = this.auth.currentRole();
-    return this.menu.filter(item => item.roles.includes(rol));
+    return this.menu
+      .filter(item => item.roles.includes(rol))
+      .map(item => !this.auth.isAdmin() && item.path === '/productos' ? {...item, label: 'Catalogo'} : item);
   }
 
   notificaciones(): Notificacion[] {
