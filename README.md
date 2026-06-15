@@ -5,9 +5,10 @@ Sistema web para administrar una empresa de chompas: login, dashboard, productos
 ## Tecnologias
 
 - Frontend: Angular 21, TypeScript, Bootstrap 5, Bootstrap Icons, CSS propio, routing, servicios HTTP, formularios reactivos y signals para estados de interfaz.
-- Backend: Java 21, Spring Boot 3, Spring Web, Spring Data JPA, Spring Security, Hibernate, validaciones con `jakarta.validation`, controladores REST, servicios, repositorios, DTOs y modelos JPA.
-- Base de datos: MySQL 8.4 con script reproducible en `database/schema.sql`.
-- Docker: `docker-compose.yml` levanta MySQL y tambien puede construir el backend con `backend-springboot/Dockerfile`.
+- Backend principal para rubrica: FastAPI, Uvicorn, MySQL Connector, endpoints REST y procedimientos almacenados.
+- Backend alternativo: Java 21, Spring Boot 3, Spring Web, Spring Data JPA, Spring Security, Hibernate, validaciones con `jakarta.validation`, controladores REST, servicios, repositorios, DTOs y modelos JPA.
+- Base de datos: MySQL 8.4 con script reproducible en `database/schema.sql`, relaciones, restricciones y procedimientos almacenados.
+- Docker: `docker-compose.yml` levanta MySQL, backend FastAPI y tambien puede construir el backend Spring Boot.
 
 ## Estructura final
 
@@ -65,6 +66,11 @@ Chompas_Mabel_Real_Angular_SpringBoot/
 |   |-- Dockerfile
 |   |-- pom.xml
 |   +-- README.md
+|-- backend-fastapi/
+|   |-- main.py
+|   |-- requirements.txt
+|   |-- Dockerfile
+|   +-- README.md
 |-- database/schema.sql
 |-- docs/
 |   |-- entregables/
@@ -77,8 +83,8 @@ Chompas_Mabel_Real_Angular_SpringBoot/
 
 ## Requisitos
 
-- Java 21
-- Maven 3.9+
+- Python 3.12+
+- Java 21 y Maven 3.9+ si se desea ejecutar tambien el backend Spring Boot alternativo
 - Node.js 22+
 - npm
 - MySQL 8.x instalado localmente o Docker Desktop
@@ -121,7 +127,17 @@ $env:SPRING_DATASOURCE_USERNAME="root"
 $env:SPRING_DATASOURCE_PASSWORD="TU_PASSWORD"
 ```
 
-En otra terminal ejecuta el backend:
+En otra terminal ejecuta el backend principal FastAPI:
+
+```bash
+cd backend-fastapi
+pip install -r requirements.txt
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+El frontend consume por defecto `http://localhost:8000/api`.
+
+Si se desea probar tambien el backend Spring Boot alternativo:
 
 ```bash
 cd backend-springboot
@@ -140,13 +156,13 @@ Abrir: `http://localhost:4200`
 
 ## Ejecucion con Docker
 
-Para levantar MySQL y construir el backend:
+Para levantar MySQL, FastAPI y Spring Boot:
 
 ```bash
 docker compose up --build
 ```
 
-El frontend se ejecuta con Angular CLI desde `frontend-angular`.
+FastAPI queda en `http://localhost:8000`, Spring Boot en `http://localhost:8080` y el frontend se ejecuta con Angular CLI desde `frontend-angular`.
 
 ## Credenciales demo
 
@@ -162,18 +178,19 @@ Los requerimientos de usuario estan documentados en `docs/requerimientos_usuario
 
 ## API principal
 
-- `POST http://localhost:8080/api/auth/login`
-- `GET http://localhost:8080/api/productos`
-- `POST http://localhost:8080/api/productos`
-- `PUT http://localhost:8080/api/productos/{id}`
-- `DELETE http://localhost:8080/api/productos/{id}`
-- `GET http://localhost:8080/api/clientes`
-- `POST http://localhost:8080/api/clientes`
-- `GET http://localhost:8080/api/pedidos`
-- `POST http://localhost:8080/api/pedidos`
-- `PATCH http://localhost:8080/api/pedidos/{id}/credito/pagar`
-- `GET http://localhost:8080/api/ventas`
-- `GET http://localhost:8080/api/inventario/movimientos`
+- `POST http://localhost:8000/api/auth/login`
+- `GET http://localhost:8000/api/productos`
+- `POST http://localhost:8000/api/productos`
+- `PUT http://localhost:8000/api/productos/{id}`
+- `DELETE http://localhost:8000/api/productos/{id}`
+- `GET http://localhost:8000/api/clientes`
+- `POST http://localhost:8000/api/clientes`
+- `GET http://localhost:8000/api/pedidos`
+- `POST http://localhost:8000/api/pedidos`
+- `PATCH http://localhost:8000/api/pedidos/{id}/credito/pagar`
+- `GET http://localhost:8000/api/ventas`
+- `GET http://localhost:8000/api/inventario/movimientos`
+- `GET http://localhost:8000/api/reportes/resumen`
 
 ## Modelo de datos
 
@@ -189,7 +206,7 @@ Las tablas reales del script son `usuarios`, `clientes`, `categorias`, `producto
 
 La tabla `pedidos` tambien guarda datos de credito: `monto_pagado`, `saldo_pendiente`, `fecha_vencimiento_credito` y `estado_credito`. Con eso se puede saber que cliente llevo productos a credito, cuanto debe, cuando vence y si el saldo ya fue pagado.
 
-El script completo de base de datos esta en `database/schema.sql` e incluye datos iniciales para probar administrador, vendedor, productos, clientes, pedidos, ventas, inventario y creditos.
+El script completo de base de datos esta en `database/schema.sql` e incluye datos iniciales y procedimientos almacenados para probar administrador, vendedor, productos, clientes, pedidos, ventas, inventario, reportes y creditos.
 
 La guia completa para crear, importar y verificar la base en otra PC esta en `docs/replicar_base_datos.md`.
 
@@ -223,12 +240,14 @@ Para pasos detallados con MySQL Workbench, XAMPP/phpMyAdmin, consola MySQL y Doc
 ## Notas de implementacion
 
 - El frontend consume el backend mediante servicios HTTP en `src/app/core/services`.
+- El backend principal FastAPI esta en `backend-fastapi` y expone los endpoints requeridos por la rubrica.
 - La pantalla de productos cambia segun rol: administrador edita catalogo/productos y vendedor ve un catalogo responsive con imagenes, filtros, tallas, colores, precios y stock.
 - La ruta `/inventario` usa un componente dedicado para movimientos de inventario y la ruta `/ventas` usa un componente dedicado para historial de ventas cerradas.
 - La barra de busqueda superior filtra en tiempo real productos, pedidos, clientes, creditos, ventas e inventario segun la vista activa.
 - Los formularios validan campos obligatorios, correo valido, precio y stock mayores o iguales a 0, cantidad mayor a 0 y nombre minimo de 3 caracteres.
-- El backend valida payloads con `jakarta.validation` y responde errores JSON desde `ApiExceptionHandler`.
+- FastAPI valida payloads con Pydantic; el backend Spring Boot alternativo valida con `jakarta.validation` y responde errores JSON desde `ApiExceptionHandler`.
 - Al registrar un pedido, el backend calcula subtotales, total, descuenta stock, registra movimientos de inventario y genera venta cuando el estado corresponde.
 - Si el metodo de pago es `Credito`, el backend calcula saldo pendiente, fecha de vencimiento y estado `PENDIENTE`, `VENCIDO` o `PAGADO`.
 - La campana de notificaciones calcula alertas reales segun creditos vencidos, pedidos pendientes y stock bajo.
 - El interceptor HTTP limpia sesion y redirige al login si el backend responde `401`.
+- La base de datos incluye procedimientos `sp_listar_productos`, `sp_listar_clientes`, `sp_listar_pedidos`, `sp_listar_detalles_pedido`, `sp_listar_ventas`, `sp_listar_movimientos_inventario` y `sp_resumen_reportes`.

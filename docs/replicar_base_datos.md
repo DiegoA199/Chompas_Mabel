@@ -17,6 +17,7 @@ Ese script crea:
 - La base de datos `chompas_mabel_db`.
 - Todas las tablas.
 - Relaciones y restricciones.
+- Procedimientos almacenados para consultas de productos, clientes, pedidos, ventas, inventario y reportes.
 - Datos iniciales para probar login, productos, clientes, pedidos, ventas, inventario y creditos.
 
 Por eso, despues de clonar el proyecto, se debe ejecutar o importar `database/schema.sql` una sola vez en MySQL.
@@ -127,6 +128,8 @@ SELECT * FROM productos;
 SELECT * FROM clientes;
 SELECT * FROM pedidos;
 SELECT * FROM ventas;
+SHOW PROCEDURE STATUS WHERE Db = 'chompas_mabel_db';
+CALL sp_resumen_reportes();
 ```
 
 Para ver creditos:
@@ -139,7 +142,7 @@ WHERE metodo_pago = 'Credito';
 
 ## Paso 4: Conectar el backend
 
-El backend ya esta configurado para conectarse a MySQL local con estos datos:
+El backend principal para la rubrica esta en `backend-fastapi` y ya esta configurado para conectarse a MySQL local con estos datos:
 
 ```text
 Host: localhost
@@ -149,7 +152,9 @@ Usuario: root
 Password: root
 ```
 
-La configuracion esta en:
+Si se ejecuta con Docker, el servicio FastAPI usa el host interno `mysql`.
+
+La configuracion del backend Spring Boot alternativo esta en:
 
 ```text
 backend-springboot/src/main/resources/application.yml
@@ -171,7 +176,15 @@ $env:SPRING_DATASOURCE_PASSWORD=""
 
 ## Paso 5: Ejecutar backend y frontend
 
-Backend:
+Backend principal FastAPI:
+
+```bash
+cd backend-fastapi
+pip install -r requirements.txt
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+Backend Spring Boot alternativo:
 
 ```bash
 cd backend-springboot
@@ -190,6 +203,12 @@ Abrir:
 
 ```text
 http://localhost:4200
+```
+
+El frontend consume por defecto:
+
+```text
+http://localhost:8000/api
 ```
 
 ## Credenciales de prueba

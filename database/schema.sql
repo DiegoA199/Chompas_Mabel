@@ -4,6 +4,14 @@ CREATE DATABASE IF NOT EXISTS chompas_mabel_db
 
 USE chompas_mabel_db;
 
+DROP PROCEDURE IF EXISTS sp_listar_productos;
+DROP PROCEDURE IF EXISTS sp_listar_clientes;
+DROP PROCEDURE IF EXISTS sp_listar_pedidos;
+DROP PROCEDURE IF EXISTS sp_listar_detalles_pedido;
+DROP PROCEDURE IF EXISTS sp_listar_ventas;
+DROP PROCEDURE IF EXISTS sp_listar_movimientos_inventario;
+DROP PROCEDURE IF EXISTS sp_resumen_reportes;
+
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS inventario_movimientos;
 DROP TABLE IF EXISTS ventas;
@@ -183,3 +191,150 @@ INSERT INTO inventario_movimientos (id, id_producto, tipo_movimiento, cantidad, 
   (11, 4, 'SALIDA', 1, '2026-05-29 18:30:00', 'Reserva por pedido PED-2026-0003'),
   (12, 6, 'SALIDA', 3, '2026-06-04 11:20:00', 'Salida por pedido a credito PED-2026-0004'),
   (13, 3, 'SALIDA', 2, '2026-06-06 16:05:00', 'Salida por pedido a credito PED-2026-0005');
+
+DELIMITER //
+
+CREATE PROCEDURE sp_listar_productos()
+BEGIN
+  SELECT
+    p.id,
+    p.codigo,
+    p.nombre,
+    p.descripcion,
+    p.id_categoria AS categoria_id,
+    c.nombre AS categoria,
+    p.talla,
+    p.color,
+    p.precio,
+    p.stock,
+    p.estado
+  FROM productos p
+  INNER JOIN categorias c ON c.id = p.id_categoria
+  ORDER BY p.nombre;
+END //
+
+CREATE PROCEDURE sp_listar_clientes()
+BEGIN
+  SELECT
+    id,
+    nombres,
+    apellidos,
+    telefono,
+    direccion,
+    correo,
+    TRIM(CONCAT(nombres, ' ', COALESCE(apellidos, ''))) AS nombre_completo
+  FROM clientes
+  ORDER BY nombres;
+END //
+
+CREATE PROCEDURE sp_listar_pedidos()
+BEGIN
+  SELECT
+    p.id,
+    p.numero,
+    p.id_cliente AS cliente_id,
+    TRIM(CONCAT(c.nombres, ' ', COALESCE(c.apellidos, ''))) AS cliente,
+    p.id_usuario AS usuario_id,
+    u.nombre AS usuario,
+    p.fecha_pedido,
+    p.fecha_entrega,
+    p.total,
+    p.estado,
+    p.metodo_pago,
+    p.monto_pagado,
+    p.saldo_pendiente,
+    p.fecha_vencimiento_credito,
+    CASE
+      WHEN p.saldo_pendiente > 0
+        AND p.fecha_vencimiento_credito IS NOT NULL
+        AND p.fecha_vencimiento_credito < CURDATE()
+      THEN 'VENCIDO'
+      ELSE p.estado_credito
+    END AS estado_credito,
+    CASE
+      WHEN p.saldo_pendiente > 0
+        AND p.fecha_vencimiento_credito IS NOT NULL
+        AND p.fecha_vencimiento_credito < CURDATE()
+      THEN TRUE
+      ELSE FALSE
+    END AS credito_vencido,
+    CASE
+      WHEN p.saldo_pendiente > 0
+        AND p.fecha_vencimiento_credito IS NOT NULL
+        AND p.fecha_vencimiento_credito < CURDATE()
+      THEN DATEDIFF(CURDATE(), p.fecha_vencimiento_credito)
+      ELSE 0
+    END AS dias_vencido,
+    v.id AS venta_id
+  FROM pedidos p
+  INNER JOIN clientes c ON c.id = p.id_cliente
+  INNER JOIN usuarios u ON u.id = p.id_usuario
+  LEFT JOIN ventas v ON v.id_pedido = p.id
+  ORDER BY p.fecha_pedido DESC;
+END //
+
+CREATE PROCEDURE sp_listar_detalles_pedido(IN p_pedido_id BIGINT)
+BEGIN
+  SELECT
+    d.id,
+    d.id_producto AS producto_id,
+    pr.nombre AS producto,
+    d.cantidad,
+    d.precio_unitario,
+    d.subtotal
+  FROM detalle_pedido d
+  INNER JOIN productos pr ON pr.id = d.id_producto
+  WHERE d.id_pedido = p_pedido_id
+  ORDER BY d.id;
+END //
+
+CREATE PROCEDURE sp_listar_ventas()
+BEGIN
+  SELECT
+    v.id,
+    p.id AS pedido_id,
+    p.numero AS numero_pedido,
+    c.id AS cliente_id,
+    TRIM(CONCAT(c.nombres, ' ', COALESCE(c.apellidos, ''))) AS cliente,
+    p.fecha_pedido,
+    v.fecha_venta,
+    v.monto_total,
+    v.tipo_comprobante,
+    p.metodo_pago,
+    p.estado AS estado_pedido
+  FROM ventas v
+  INNER JOIN pedidos p ON p.id = v.id_pedido
+  INNER JOIN clientes c ON c.id = p.id_cliente
+  ORDER BY v.fecha_venta DESC;
+END //
+
+CREATE PROCEDURE sp_listar_movimientos_inventario(IN p_producto_id BIGINT)
+BEGIN
+  SELECT
+    m.id,
+    p.id AS producto_id,
+    p.codigo AS codigo_producto,
+    p.nombre AS producto,
+    c.nombre AS categoria,
+    m.tipo_movimiento,
+    m.cantidad,
+    m.fecha_movimiento,
+    m.observacion
+  FROM inventario_movimientos m
+  INNER JOIN productos p ON p.id = m.id_producto
+  INNER JOIN categorias c ON c.id = p.id_categoria
+  WHERE p_producto_id IS NULL OR m.id_producto = p_producto_id
+  ORDER BY m.fecha_movimiento DESC;
+END //
+
+CREATE PROCEDURE sp_resumen_reportes()
+BEGIN
+  SELECT
+    (SELECT COALESCE(SUM(monto_total), 0) FROM ventas) AS total_ventas,
+    (SELECT COALESCE(SUM(saldo_pendiente), 0) FROM pedidos WHERE estado_credito <> 'SIN_CREDITO') AS saldo_credito,
+    (SELECT COUNT(*) FROM pedidos WHERE saldo_pendiente > 0 AND fecha_vencimiento_credito < CURDATE()) AS creditos_vencidos,
+    (SELECT COALESCE(SUM(stock * precio), 0) FROM productos) AS valor_inventario,
+    (SELECT COUNT(*) FROM productos WHERE stock <= 10) AS productos_stock_bajo;
+END //
+
+DELIMITER ;

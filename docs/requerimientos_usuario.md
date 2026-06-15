@@ -66,7 +66,7 @@ Flujo principal:
 
 ## Script de base de datos
 
-El script completo se encuentra en `database/schema.sql`. Crea la base `chompas_mabel_db`, tablas, relaciones, restricciones y datos iniciales para usuarios, productos, clientes, pedidos, ventas, inventario y creditos.
+El script completo se encuentra en `database/schema.sql`. Crea la base `chompas_mabel_db`, tablas, relaciones, restricciones, procedimientos almacenados y datos iniciales para usuarios, productos, clientes, pedidos, ventas, inventario y creditos.
 
 Para replicar el proyecto en otra computadora no es obligatorio usar Docker. Se puede instalar MySQL local, abrir `database/schema.sql` en MySQL Workbench o importarlo con:
 
@@ -77,3 +77,7 @@ mysql -u root -p < database/schema.sql
 Docker Compose queda como alternativa automatizada para levantar MySQL y cargar el mismo script.
 
 La explicacion paso a paso para replicar la base de datos esta en `docs/replicar_base_datos.md`.
+
+## Backend de evaluacion
+
+Para cumplir la rubrica, el backend principal esta en `backend-fastapi` y expone la API REST con FastAPI en `http://localhost:8000/api`. El proyecto conserva `backend-springboot` como implementacion alternativa y referencia de la arquitectura anterior.

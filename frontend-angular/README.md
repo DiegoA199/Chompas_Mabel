@@ -19,9 +19,11 @@ src/app/
 |   |-- clientes/
 |   |-- creditos/
 |   |-- dashboard/
+|   |-- inventario/
 |   |-- pedidos/
 |   |-- productos/
-|   +-- reportes/
+|   |-- reportes/
+|   +-- ventas/
 |-- layout/
 |-- app.component.ts
 +-- app.routes.ts
@@ -40,7 +42,9 @@ Abrir `http://localhost:4200`.
 
 ## Conexion API
 
-Los servicios HTTP estan en `src/app/core/services` y consumen el backend Spring Boot en `http://localhost:8080/api`.
+Los servicios HTTP estan en `src/app/core/services` y consumen por defecto el backend FastAPI en `http://localhost:8000/api`.
+
+El backend Spring Boot queda como alternativa compatible en `http://localhost:8080/api` si se cambia `src/app/core/services/environment.ts`.
 
 El modulo de creditos usa `PedidoService` para listar pedidos a credito, mostrar saldos vencidos y marcar una cuenta como pagada.
 
