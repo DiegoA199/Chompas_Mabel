@@ -73,21 +73,49 @@ Chompas_Mabel_Real_Angular_SpringBoot/
 
 ## Requisitos
 
-- Docker Desktop
 - Java 21
 - Maven 3.9+
 - Node.js 22+
 - npm
+- MySQL 8.x instalado localmente o Docker Desktop
 
 ## Ejecucion local
 
-Desde la raiz del proyecto, levanta MySQL:
+Primero levanta la base de datos. Puedes usar Docker o MySQL local.
+
+### Opcion A: Base de datos con Docker
 
 ```bash
 docker compose up -d mysql
 ```
 
 La base creada es `chompas_mabel_db` y se inicializa con `database/schema.sql`.
+
+### Opcion B: Base de datos con MySQL local
+
+Si Docker demora o no sincroniza bien, instala MySQL Server o usa MySQL Workbench/XAMPP e importa el script completo:
+
+```bash
+mysql -u root -p < database/schema.sql
+```
+
+En MySQL Workbench tambien puedes abrir `database/schema.sql` y ejecutarlo con el boton de rayo. En XAMPP/phpMyAdmin puedes entrar a `http://localhost/phpmyadmin` e importar el mismo archivo.
+
+El backend usa por defecto:
+
+```text
+Base: chompas_mabel_db
+Usuario: root
+Password: root
+Puerto: 3306
+```
+
+Si tu MySQL tiene otra contrasena, configura las variables antes de correr el backend:
+
+```powershell
+$env:SPRING_DATASOURCE_USERNAME="root"
+$env:SPRING_DATASOURCE_PASSWORD="TU_PASSWORD"
+```
 
 En otra terminal ejecuta el backend:
 
@@ -164,10 +192,23 @@ El enlace del repositorio se puede copiar desde GitHub o descargar usando GitHub
 ```bash
 git clone URL_DEL_REPOSITORIO
 cd Chompas_Mabel_Real_Angular_SpringBoot
+```
+
+Luego elige una forma de crear la base:
+
+Con Docker:
+
+```bash
 docker compose up -d mysql
 ```
 
-Luego ejecuta el backend y frontend con los comandos anteriores. No subas `node_modules`, `dist`, `target` ni datos locales de MySQL; `database/schema.sql` y `docker-compose.yml` recrean la base con datos iniciales.
+Sin Docker, usando MySQL local:
+
+```bash
+mysql -u root -p < database/schema.sql
+```
+
+Despues ejecuta el backend y frontend con los comandos anteriores. No subas `node_modules`, `dist`, `target` ni datos locales de MySQL; `database/schema.sql` recrea toda la base con datos iniciales y `docker-compose.yml` queda como alternativa automatizada.
 
 ## Notas de implementacion
 

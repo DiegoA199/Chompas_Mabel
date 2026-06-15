@@ -27,17 +27,34 @@ La API queda disponible en `http://localhost:8080/api`.
 
 ## Base de datos
 
-El backend se conecta a MySQL con las variables configuradas en `src/main/resources/application.yml`. En desarrollo local, la base se crea desde `../database/schema.sql` al levantar MySQL con Docker Compose:
+El backend se conecta a MySQL con las variables configuradas en `src/main/resources/application.yml`. La base se puede crear con Docker o con MySQL local.
+
+Con Docker Compose:
 
 ```bash
 docker compose up -d mysql
 ```
+
+Sin Docker, ejecuta el script completo en MySQL local:
+
+```bash
+mysql -u root -p < ../database/schema.sql
+```
+
+Tambien puedes abrir `../database/schema.sql` en MySQL Workbench y ejecutarlo completo, o importarlo desde phpMyAdmin si usas XAMPP.
 
 Credenciales por defecto:
 
 - Base: `chompas_mabel_db`
 - Usuario: `root`
 - Password: `root`
+
+Si tu MySQL local usa otra contrasena, configura:
+
+```powershell
+$env:SPRING_DATASOURCE_USERNAME="root"
+$env:SPRING_DATASOURCE_PASSWORD="TU_PASSWORD"
+```
 
 ## Endpoints principales
 
