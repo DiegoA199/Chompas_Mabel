@@ -432,6 +432,13 @@ body {
   box-shadow: 0 0 0 1px #d1d5db;
 }
 
+.inventory-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 340px);
+  align-items: end;
+  gap: 16px;
+}
+
 @media (max-width: 992px) {
   .sidebar {
     width: 88px;
@@ -463,6 +470,10 @@ body {
 
   .catalog-categories {
     justify-content: flex-start;
+  }
+
+  .inventory-toolbar {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -505,10 +516,13 @@ body {
   .topbar {
     height: auto;
     padding: 12px 16px;
+    flex-wrap: wrap;
   }
 
   .topbar .search {
-    display: none;
+    order: 2;
+    flex: 1 0 100%;
+    max-width: none;
   }
 
   .topbar .user-meta {

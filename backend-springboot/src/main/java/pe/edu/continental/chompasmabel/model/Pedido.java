@@ -138,6 +138,7 @@ public class Pedido {
         CONFIRMADO,
         EN_PROCESO,
         ENTREGADO,
+        VENDIDO,
         CANCELADO
     }
 

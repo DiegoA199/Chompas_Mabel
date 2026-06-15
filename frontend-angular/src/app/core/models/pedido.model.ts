@@ -1,4 +1,4 @@
-export type EstadoPedido = 'PENDIENTE' | 'CONFIRMADO' | 'EN_PROCESO' | 'ENTREGADO' | 'CANCELADO';
+export type EstadoPedido = 'PENDIENTE' | 'CONFIRMADO' | 'EN_PROCESO' | 'ENTREGADO' | 'VENDIDO' | 'CANCELADO';
 export type EstadoCredito = 'SIN_CREDITO' | 'PENDIENTE' | 'VENCIDO' | 'PAGADO';
 
 export interface DetallePedido {

@@ -139,7 +139,8 @@ public class PedidoService {
     private boolean generaVenta(Pedido.EstadoPedido estado) {
         return estado == Pedido.EstadoPedido.CONFIRMADO
                 || estado == Pedido.EstadoPedido.EN_PROCESO
-                || estado == Pedido.EstadoPedido.ENTREGADO;
+                || estado == Pedido.EstadoPedido.ENTREGADO
+                || estado == Pedido.EstadoPedido.VENDIDO;
     }
 
     private void aplicarCredito(Pedido pedido, BigDecimal montoPagadoSolicitado, LocalDate fechaVencimientoSolicitada) {

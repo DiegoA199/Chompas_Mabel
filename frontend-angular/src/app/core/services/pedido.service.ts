@@ -10,7 +10,9 @@ export class PedidoService {
 
   pedidos = computed(() => this.pedidosSignal());
   ventasDia = computed(() => this.pedidosSignal().reduce((suma, pedido) => suma + pedido.total, 0));
-  activos = computed(() => this.pedidosSignal().filter(pedido => pedido.estado !== 'ENTREGADO' && pedido.estado !== 'CANCELADO').length);
+  ventasCerradas = computed(() => this.pedidosSignal().filter(pedido => this.esVentaCerrada(pedido)));
+  totalVentasCerradas = computed(() => this.ventasCerradas().reduce((suma, pedido) => suma + pedido.total, 0));
+  activos = computed(() => this.pedidosSignal().filter(pedido => !['ENTREGADO', 'VENDIDO', 'CANCELADO'].includes(pedido.estado)).length);
   creditos = computed(() => this.pedidosSignal().filter(pedido => pedido.estadoCredito !== 'SIN_CREDITO'));
   creditosPendientes = computed(() => this.creditos().filter(pedido => pedido.saldoPendiente > 0 && !pedido.creditoVencido));
   creditosVencidos = computed(() => this.creditos().filter(pedido => pedido.saldoPendiente > 0 && pedido.creditoVencido));
@@ -43,5 +45,9 @@ export class PedidoService {
         pedidos.map(pedido => pedido.id === actualizado.id ? actualizado : pedido)
       ))
     );
+  }
+
+  private esVentaCerrada(pedido: Pedido): boolean {
+    return pedido.estado === 'ENTREGADO' || pedido.estado === 'VENDIDO';
   }
 }

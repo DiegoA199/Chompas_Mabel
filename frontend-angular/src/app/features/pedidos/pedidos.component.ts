@@ -1,8 +1,9 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { EstadoPedido, PedidoPayload } from '../../core/models/pedido.model';
+import { EstadoPedido, Pedido, PedidoPayload } from '../../core/models/pedido.model';
 import { AuthService } from '../../core/services/auth.service';
+import { BusquedaService } from '../../core/services/busqueda.service';
 import { ClienteService } from '../../core/services/cliente.service';
 import { PedidoService } from '../../core/services/pedido.service';
 import { ProductoService } from '../../core/services/producto.service';
@@ -100,7 +101,7 @@ import { ProductoService } from '../../core/services/producto.service';
     <table class="table table-hover">
       <thead><tr><th>Nro Pedido</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Estado</th><th>Metodo de pago</th><th>Credito</th><th>Entrega</th><th>Venta</th></tr></thead>
       <tbody>
-        @for(p of service.pedidos(); track p.id){
+        @for(p of pedidosFiltrados(); track p.id){
           <tr>
             <td class="text-brand fw-bold">{{p.numero}}</td>
             <td>{{p.cliente}}</td>
@@ -126,7 +127,7 @@ import { ProductoService } from '../../core/services/producto.service';
   </div>
 </div>`})
 export class PedidosComponent implements OnInit {
-  estados: EstadoPedido[] = ['PENDIENTE', 'CONFIRMADO', 'EN_PROCESO', 'ENTREGADO', 'CANCELADO'];
+  estados: EstadoPedido[] = ['PENDIENTE', 'CONFIRMADO', 'EN_PROCESO', 'ENTREGADO', 'VENDIDO', 'CANCELADO'];
   guardando = signal(false);
   errorFormulario = signal('');
 
@@ -145,6 +146,7 @@ export class PedidosComponent implements OnInit {
     public clientes: ClienteService,
     public productos: ProductoService,
     public auth: AuthService,
+    private busqueda: BusquedaService,
     private fb: NonNullableFormBuilder
   ) {}
 
@@ -195,5 +197,19 @@ export class PedidosComponent implements OnInit {
 
   saldoEstimado(): number {
     return Math.max(this.totalEstimado() - this.form.controls.montoPagado.value, 0);
+  }
+
+  pedidosFiltrados(): Pedido[] {
+    return this.service.pedidos().filter(pedido => this.busqueda.coincide(
+      pedido.numero,
+      pedido.cliente,
+      pedido.usuario,
+      pedido.estado,
+      pedido.metodoPago,
+      pedido.estadoCredito,
+      pedido.total,
+      pedido.saldoPendiente,
+      pedido.detalles.map(detalle => detalle.producto).join(' ')
+    ));
   }
 }

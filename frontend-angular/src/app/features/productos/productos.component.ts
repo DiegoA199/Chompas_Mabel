@@ -3,6 +3,7 @@ import { CurrencyPipe } from '@angular/common';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Producto, ProductoPayload } from '../../core/models/producto.model';
 import { AuthService } from '../../core/services/auth.service';
+import { BusquedaService } from '../../core/services/busqueda.service';
 import { ProductoService } from '../../core/services/producto.service';
 
 @Component({selector:'app-productos',standalone:true,imports:[ReactiveFormsModule,CurrencyPipe],template:`
@@ -89,7 +90,7 @@ import { ProductoService } from '../../core/services/producto.service';
       <table class="table table-hover">
         <thead><tr><th>Codigo</th><th>Producto</th><th>Categoria</th><th>Talla</th><th>Color</th><th>Stock</th><th>Precio</th><th>Estado</th><th>Acciones</th></tr></thead>
         <tbody>
-          @for(p of service.productos(); track p.id){
+          @for(p of productosFiltrados(); track p.id){
             <tr>
               <td>{{p.codigo}}</td>
               <td><strong>{{p.nombre}}</strong><br><small class="text-muted">{{p.descripcion}}</small></td>
@@ -125,7 +126,7 @@ import { ProductoService } from '../../core/services/producto.service';
   <div class="catalog-toolbar mb-4">
     <div class="input-group">
       <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-      <input class="form-control" [value]="busqueda()" (input)="buscar($event)" placeholder="Buscar por modelo, color o talla">
+      <input class="form-control" [value]="busqueda.termino()" (input)="buscar($event)" placeholder="Buscar por modelo, color o talla">
     </div>
     <div class="catalog-categories">
       <button type="button" class="btn btn-sm" [class.btn-brand]="categoriaActiva()==='Todas'" [class.btn-outline-secondary]="categoriaActiva()!=='Todas'" (click)="filtrarCategoria('Todas')">Todas</button>
@@ -172,7 +173,6 @@ export class ProductosComponent implements OnInit {
   editandoId = signal<number | null>(null);
   guardando = signal(false);
   errorFormulario = signal('');
-  busqueda = signal('');
   categoriaActiva = signal('Todas');
 
   form = this.fb.group({
@@ -186,7 +186,12 @@ export class ProductosComponent implements OnInit {
     stock: [0, [Validators.required, Validators.min(0)]]
   });
 
-  constructor(public service: ProductoService, private fb: NonNullableFormBuilder, public auth: AuthService) {}
+  constructor(
+    public service: ProductoService,
+    private fb: NonNullableFormBuilder,
+    public auth: AuthService,
+    public busqueda: BusquedaService
+  ) {}
 
   ngOnInit(): void {
     this.service.cargarDesdeApi();
@@ -249,7 +254,7 @@ export class ProductosComponent implements OnInit {
 
   buscar(evento: Event): void {
     const input = evento.target as HTMLInputElement;
-    this.busqueda.set(input.value);
+    this.busqueda.actualizar(input.value);
   }
 
   filtrarCategoria(categoria: string): void {
@@ -261,12 +266,19 @@ export class ProductosComponent implements OnInit {
   }
 
   productosFiltrados(): Producto[] {
-    const texto = this.busqueda().trim().toLowerCase();
     const categoria = this.categoriaActiva();
     return this.service.productos().filter(producto => {
       const coincideCategoria = categoria === 'Todas' || producto.categoria === categoria;
-      const contenido = `${producto.nombre} ${producto.descripcion ?? ''} ${producto.color} ${producto.talla} ${producto.categoria}`.toLowerCase();
-      return coincideCategoria && (!texto || contenido.includes(texto));
+      return coincideCategoria && this.busqueda.coincide(
+        producto.codigo,
+        producto.nombre,
+        producto.descripcion,
+        producto.categoria,
+        producto.talla,
+        producto.color,
+        producto.precio,
+        producto.stock
+      );
     });
   }
 

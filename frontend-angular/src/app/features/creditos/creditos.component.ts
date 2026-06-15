@@ -1,6 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Pedido } from '../../core/models/pedido.model';
+import { BusquedaService } from '../../core/services/busqueda.service';
 import { PedidoService } from '../../core/services/pedido.service';
 
 @Component({selector:'app-creditos',standalone:true,imports:[CurrencyPipe,DatePipe],template:`
@@ -33,7 +34,7 @@ import { PedidoService } from '../../core/services/pedido.service';
         <tr><th>Pedido</th><th>Cliente</th><th>Total</th><th>Pagado</th><th>Saldo</th><th>Vencimiento</th><th>Estado</th><th></th></tr>
       </thead>
       <tbody>
-        @for(credito of service.creditos(); track credito.id){
+        @for(credito of creditosFiltrados(); track credito.id){
           <tr>
             <td class="text-brand fw-bold">{{credito.numero}}</td>
             <td>{{credito.cliente}}</td>
@@ -66,7 +67,7 @@ import { PedidoService } from '../../core/services/pedido.service';
 export class CreditosComponent implements OnInit {
   pagandoId = signal<number | null>(null);
 
-  constructor(public service: PedidoService) {}
+  constructor(public service: PedidoService, private busqueda: BusquedaService) {}
 
   ngOnInit(): void {
     this.service.cargarDesdeApi();
@@ -91,5 +92,18 @@ export class CreditosComponent implements OnInit {
       return `VENCIDO ${credito.diasVencido} dia(s)`;
     }
     return 'PENDIENTE';
+  }
+
+  creditosFiltrados(): Pedido[] {
+    return this.service.creditos().filter(credito => this.busqueda.coincide(
+      credito.numero,
+      credito.cliente,
+      credito.estadoCredito,
+      this.etiquetaEstado(credito),
+      credito.total,
+      credito.montoPagado,
+      credito.saldoPendiente,
+      credito.fechaVencimientoCredito
+    ));
   }
 }

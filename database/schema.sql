@@ -148,11 +148,11 @@ INSERT INTO productos (id, codigo, nombre, descripcion, id_categoria, talla, col
   (6, 'CHP-006', 'Chompa Infantil Termica', 'Tejido termico para ninos', 2, '8-10-12', 'Rojo', 89.00, 4, 'STOCK_BAJO');
 
 INSERT INTO pedidos (id, numero, id_cliente, id_usuario, fecha_pedido, fecha_entrega, total, estado, metodo_pago, monto_pagado, saldo_pendiente, fecha_vencimiento_credito, estado_credito) VALUES
-  (1, 'PED-2026-0001', 1, 2, '2026-05-28 10:15:00', '2026-05-30', 588.00, 'CONFIRMADO', 'Yape', 588.00, 0.00, NULL, 'SIN_CREDITO'),
-  (2, 'PED-2026-0002', 3, 2, '2026-05-29 09:45:00', '2026-06-02', 1275.00, 'EN_PROCESO', 'Transferencia', 1275.00, 0.00, NULL, 'SIN_CREDITO'),
+  (1, 'PED-2026-0001', 1, 2, '2026-05-28 10:15:00', '2026-05-30', 588.00, 'ENTREGADO', 'Yape', 588.00, 0.00, NULL, 'SIN_CREDITO'),
+  (2, 'PED-2026-0002', 3, 2, '2026-05-29 09:45:00', '2026-06-02', 1275.00, 'ENTREGADO', 'Transferencia', 1275.00, 0.00, NULL, 'SIN_CREDITO'),
   (3, 'PED-2026-0003', 2, 1, '2026-05-29 18:30:00', '2026-06-01', 420.00, 'PENDIENTE', 'Efectivo', 0.00, 0.00, NULL, 'SIN_CREDITO'),
-  (4, 'PED-2026-0004', 4, 2, '2026-06-04 11:20:00', '2026-06-07', 267.00, 'CONFIRMADO', 'Credito', 50.00, 217.00, '2026-06-09', 'VENCIDO'),
-  (5, 'PED-2026-0005', 1, 2, '2026-06-06 16:05:00', '2026-06-09', 250.00, 'EN_PROCESO', 'Credito', 0.00, 250.00, '2026-06-18', 'PENDIENTE');
+  (4, 'PED-2026-0004', 4, 2, '2026-06-04 11:20:00', '2026-06-07', 267.00, 'ENTREGADO', 'Credito', 50.00, 217.00, '2026-06-09', 'VENCIDO'),
+  (5, 'PED-2026-0005', 1, 2, '2026-06-06 16:05:00', '2026-06-09', 250.00, 'ENTREGADO', 'Credito', 0.00, 250.00, '2026-06-18', 'PENDIENTE');
 
 INSERT INTO detalle_pedido (id, id_pedido, id_producto, cantidad, precio_unitario, subtotal) VALUES
   (1, 1, 1, 2, 245.00, 490.00),

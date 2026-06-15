@@ -33,9 +33,11 @@ Chompas_Mabel_Real_Angular_SpringBoot/
 |   |   |   |   |-- clientes/clientes.component.ts
 |   |   |   |   |-- dashboard/dashboard.component.ts
 |   |   |   |   |-- creditos/creditos.component.ts
+|   |   |   |   |-- inventario/inventario.component.ts
 |   |   |   |   |-- pedidos/pedidos.component.ts
 |   |   |   |   |-- productos/productos.component.ts
-|   |   |   |   +-- reportes/reportes.component.ts
+|   |   |   |   |-- reportes/reportes.component.ts
+|   |   |   |   +-- ventas/ventas.component.ts
 |   |   |   |-- layout/layout.component.ts
 |   |   |   |-- app.component.ts
 |   |   |   +-- app.routes.ts
@@ -170,6 +172,8 @@ Los requerimientos de usuario estan documentados en `docs/requerimientos_usuario
 - `GET http://localhost:8080/api/pedidos`
 - `POST http://localhost:8080/api/pedidos`
 - `PATCH http://localhost:8080/api/pedidos/{id}/credito/pagar`
+- `GET http://localhost:8080/api/ventas`
+- `GET http://localhost:8080/api/inventario/movimientos`
 
 ## Modelo de datos
 
@@ -219,9 +223,12 @@ Para pasos detallados con MySQL Workbench, XAMPP/phpMyAdmin, consola MySQL y Doc
 ## Notas de implementacion
 
 - El frontend consume el backend mediante servicios HTTP en `src/app/core/services`.
-- La pantalla de productos cambia segun rol: administrador edita inventario y vendedor ve un catalogo responsive con imagenes, filtros, tallas, colores, precios y stock.
+- La pantalla de productos cambia segun rol: administrador edita catalogo/productos y vendedor ve un catalogo responsive con imagenes, filtros, tallas, colores, precios y stock.
+- La ruta `/inventario` usa un componente dedicado para movimientos de inventario y la ruta `/ventas` usa un componente dedicado para historial de ventas cerradas.
+- La barra de busqueda superior filtra en tiempo real productos, pedidos, clientes, creditos, ventas e inventario segun la vista activa.
 - Los formularios validan campos obligatorios, correo valido, precio y stock mayores o iguales a 0, cantidad mayor a 0 y nombre minimo de 3 caracteres.
 - El backend valida payloads con `jakarta.validation` y responde errores JSON desde `ApiExceptionHandler`.
 - Al registrar un pedido, el backend calcula subtotales, total, descuenta stock, registra movimientos de inventario y genera venta cuando el estado corresponde.
 - Si el metodo de pago es `Credito`, el backend calcula saldo pendiente, fecha de vencimiento y estado `PENDIENTE`, `VENCIDO` o `PAGADO`.
 - La campana de notificaciones calcula alertas reales segun creditos vencidos, pedidos pendientes y stock bajo.
+- El interceptor HTTP limpia sesion y redirige al login si el backend responde `401`.

@@ -7,6 +7,8 @@ import { PedidosComponent } from './features/pedidos/pedidos.component';
 import { ClientesComponent } from './features/clientes/clientes.component';
 import { ReportesComponent } from './features/reportes/reportes.component';
 import { CreditosComponent } from './features/creditos/creditos.component';
+import { InventarioComponent } from './features/inventario/inventario.component';
+import { VentasComponent } from './features/ventas/ventas.component';
 import { roleGuard } from './core/services/role.guard';
 
 export const routes: Routes = [
@@ -15,10 +17,10 @@ export const routes: Routes = [
     {path:'', redirectTo:'dashboard', pathMatch:'full'},
     {path:'dashboard', component: DashboardComponent},
     {path:'productos', component: ProductosComponent},
-    {path:'inventario', component: ProductosComponent, canActivate:[roleGuard], data:{roles:['ADMIN']}},
+    {path:'inventario', component: InventarioComponent, canActivate:[roleGuard], data:{roles:['ADMIN']}},
     {path:'pedidos', component: PedidosComponent},
     {path:'clientes', component: ClientesComponent},
-    {path:'ventas', component: PedidosComponent},
+    {path:'ventas', component: VentasComponent},
     {path:'creditos', component: CreditosComponent},
     {path:'reportes', component: ReportesComponent, canActivate:[roleGuard], data:{roles:['ADMIN']}}
   ]},

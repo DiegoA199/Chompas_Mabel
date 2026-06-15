@@ -1,5 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Cliente } from '../../core/models/cliente.model';
+import { BusquedaService } from '../../core/services/busqueda.service';
 import { ClienteService } from '../../core/services/cliente.service';
 
 @Component({selector:'app-clientes',standalone:true,imports:[ReactiveFormsModule],template:`
@@ -51,7 +53,7 @@ import { ClienteService } from '../../core/services/cliente.service';
     <table class="table table-hover">
       <thead><tr><th>Cliente</th><th>Telefono</th><th>Correo</th><th>Direccion</th></tr></thead>
       <tbody>
-        @for(c of service.clientes(); track c.id){
+        @for(c of clientesFiltrados(); track c.id){
           <tr><td><strong>{{c.nombreCompleto || (c.nombres + ' ' + (c.apellidos || ''))}}</strong></td><td>{{c.telefono}}</td><td>{{c.correo}}</td><td>{{c.direccion}}</td></tr>
         }
       </tbody>
@@ -70,7 +72,7 @@ export class ClientesComponent implements OnInit {
     direccion: ['']
   });
 
-  constructor(public service: ClienteService, private fb: NonNullableFormBuilder) {}
+  constructor(public service: ClienteService, private fb: NonNullableFormBuilder, private busqueda: BusquedaService) {}
 
   ngOnInit(): void {
     this.service.cargarDesdeApi();
@@ -89,5 +91,16 @@ export class ClientesComponent implements OnInit {
       error: () => this.errorFormulario.set('No se pudo registrar el cliente. Revisa el correo y los campos obligatorios.'),
       complete: () => this.guardando.set(false)
     });
+  }
+
+  clientesFiltrados(): Cliente[] {
+    return this.service.clientes().filter(cliente => this.busqueda.coincide(
+      cliente.nombreCompleto,
+      cliente.nombres,
+      cliente.apellidos,
+      cliente.telefono,
+      cliente.correo,
+      cliente.direccion
+    ));
   }
 }

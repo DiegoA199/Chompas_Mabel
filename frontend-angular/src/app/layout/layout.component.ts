@@ -1,6 +1,8 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs';
 import { AuthService } from '../core/services/auth.service';
+import { BusquedaService } from '../core/services/busqueda.service';
 import { PedidoService } from '../core/services/pedido.service';
 import { ProductoService } from '../core/services/producto.service';
 
@@ -25,7 +27,12 @@ type Notificacion = {titulo: string; detalle: string; icon: string; path: string
     <header class="topbar">
       <div class="input-group search">
         <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-        <input class="form-control" placeholder="Buscar productos, pedidos, clientes...">
+        <input class="form-control" [value]="busqueda.termino()" (input)="actualizarBusqueda($event)" [placeholder]="placeholderBusqueda()">
+        @if(busqueda.termino()){
+          <button type="button" class="btn btn-outline-secondary" (click)="busqueda.limpiar()" aria-label="Limpiar busqueda">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        }
       </div>
       <div class="d-flex align-items-center gap-3">
         <div class="notification-wrapper">
@@ -62,6 +69,7 @@ type Notificacion = {titulo: string; detalle: string; icon: string; path: string
 </div>`})
 export class LayoutComponent implements OnInit {
   notificacionesAbiertas = signal(false);
+  rutaActiva = signal('dashboard');
 
   menu = [
     {label:'Dashboard',path:'/dashboard',icon:'bi-speedometer2',roles:['ADMIN','VENDEDOR']},
@@ -74,11 +82,21 @@ export class LayoutComponent implements OnInit {
     {label:'Reportes',path:'/reportes',icon:'bi-bar-chart',roles:['ADMIN']}
   ] satisfies MenuItem[];
 
-  constructor(public auth: AuthService, private pedidos: PedidoService, private productos: ProductoService) {}
+  constructor(
+    public auth: AuthService,
+    public busqueda: BusquedaService,
+    private pedidos: PedidoService,
+    private productos: ProductoService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.pedidos.cargarDesdeApi();
     this.productos.cargarDesdeApi();
+    this.actualizarRuta(this.router.url);
+    this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe(event => this.actualizarRuta(event.urlAfterRedirects));
   }
 
   menuVisible(): MenuItem[] {
@@ -127,11 +145,32 @@ export class LayoutComponent implements OnInit {
     this.notificacionesAbiertas.update(abierto => !abierto);
   }
 
+  actualizarBusqueda(evento: Event): void {
+    const input = evento.target as HTMLInputElement;
+    this.busqueda.actualizar(input.value);
+  }
+
+  placeholderBusqueda(): string {
+    const ruta = this.rutaActiva();
+    if (ruta === 'productos') return 'Buscar productos, tallas, colores...';
+    if (ruta === 'pedidos') return 'Buscar pedidos, clientes, estados...';
+    if (ruta === 'clientes') return 'Buscar clientes, telefono, correo...';
+    if (ruta === 'creditos') return 'Buscar creditos, clientes, estados...';
+    if (ruta === 'ventas') return 'Buscar ventas, clientes, productos...';
+    if (ruta === 'inventario') return 'Buscar movimientos, productos, tipo...';
+    return 'Buscar en la vista actual...';
+  }
+
   iniciales(): string {
     return this.auth.currentUser().split(' ').slice(0, 2).map(parte => parte[0] ?? '').join('').toUpperCase();
   }
 
   private formatoMoneda(valor: number): string {
     return `S/ ${valor.toFixed(2)}`;
+  }
+
+  private actualizarRuta(url: string): void {
+    const ruta = url.split('?')[0].replace(/^\/+/, '').split('/')[0] || 'dashboard';
+    this.rutaActiva.set(ruta);
   }
 }
