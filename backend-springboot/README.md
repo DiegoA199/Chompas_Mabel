@@ -43,6 +43,8 @@ mysql -u root -p < ../database/schema.sql
 
 Tambien puedes abrir `../database/schema.sql` en MySQL Workbench y ejecutarlo completo, o importarlo desde phpMyAdmin si usas XAMPP.
 
+La guia detallada de replicacion esta en `../docs/replicar_base_datos.md`.
+
 Credenciales por defecto:
 
 - Base: `chompas_mabel_db`

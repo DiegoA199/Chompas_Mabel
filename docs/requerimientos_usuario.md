@@ -75,3 +75,5 @@ mysql -u root -p < database/schema.sql
 ```
 
 Docker Compose queda como alternativa automatizada para levantar MySQL y cargar el mismo script.
+
+La explicacion paso a paso para replicar la base de datos esta en `docs/replicar_base_datos.md`.

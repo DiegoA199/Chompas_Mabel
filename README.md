@@ -66,6 +66,8 @@ Chompas_Mabel_Real_Angular_SpringBoot/
 |-- database/schema.sql
 |-- docs/
 |   |-- entregables/
+|   |-- replicar_base_datos.md
+|   |-- requerimientos_usuario.md
 |   +-- imagenes/
 |-- docker-compose.yml
 +-- README.md
@@ -185,6 +187,8 @@ La tabla `pedidos` tambien guarda datos de credito: `monto_pagado`, `saldo_pendi
 
 El script completo de base de datos esta en `database/schema.sql` e incluye datos iniciales para probar administrador, vendedor, productos, clientes, pedidos, ventas, inventario y creditos.
 
+La guia completa para crear, importar y verificar la base en otra PC esta en `docs/replicar_base_datos.md`.
+
 ## Replicar en otra PC
 
 El enlace del repositorio se puede copiar desde GitHub o descargar usando GitHub Desktop.
@@ -209,6 +213,8 @@ mysql -u root -p < database/schema.sql
 ```
 
 Despues ejecuta el backend y frontend con los comandos anteriores. No subas `node_modules`, `dist`, `target` ni datos locales de MySQL; `database/schema.sql` recrea toda la base con datos iniciales y `docker-compose.yml` queda como alternativa automatizada.
+
+Para pasos detallados con MySQL Workbench, XAMPP/phpMyAdmin, consola MySQL y Docker, revisar `docs/replicar_base_datos.md`.
 
 ## Notas de implementacion
 
