@@ -160,19 +160,21 @@ La configuracion del backend Spring Boot alternativo esta en:
 backend-springboot/src/main/resources/application.yml
 ```
 
-Si MySQL usa otra contrasena, antes de correr el backend se debe configurar:
+Si MySQL usa otra contrasena, antes de correr el backend FastAPI se debe configurar:
 
 ```powershell
-$env:SPRING_DATASOURCE_USERNAME="root"
-$env:SPRING_DATASOURCE_PASSWORD="TU_PASSWORD"
+$env:MYSQL_USER="root"
+$env:MYSQL_PASSWORD="TU_PASSWORD"
 ```
 
 Si XAMPP usa root sin contrasena:
 
 ```powershell
-$env:SPRING_DATASOURCE_USERNAME="root"
-$env:SPRING_DATASOURCE_PASSWORD=""
+$env:MYSQL_USER="root"
+$env:MYSQL_PASSWORD=""
 ```
+
+Para el backend Spring Boot alternativo se usan `SPRING_DATASOURCE_USERNAME` y `SPRING_DATASOURCE_PASSWORD`.
 
 ## Paso 5: Ejecutar backend y frontend
 
@@ -224,12 +226,14 @@ Cuando el proyecto se despliegue en Render u otro hosting, el proceso sera parec
 
 1. Crear una base MySQL en la nube.
 2. Ejecutar `database/schema.sql` en esa base.
-3. Configurar el backend con variables de entorno:
+3. Configurar el backend FastAPI con variables de entorno:
 
 ```text
-SPRING_DATASOURCE_URL
-SPRING_DATASOURCE_USERNAME
-SPRING_DATASOURCE_PASSWORD
+MYSQL_HOST
+MYSQL_PORT
+MYSQL_DATABASE
+MYSQL_USER
+MYSQL_PASSWORD
 ```
 
 4. Cambiar el frontend para consumir la URL publica del backend.

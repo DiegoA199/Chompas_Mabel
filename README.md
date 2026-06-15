@@ -123,8 +123,8 @@ Puerto: 3306
 Si tu MySQL tiene otra contrasena, configura las variables antes de correr el backend:
 
 ```powershell
-$env:SPRING_DATASOURCE_USERNAME="root"
-$env:SPRING_DATASOURCE_PASSWORD="TU_PASSWORD"
+$env:MYSQL_USER="root"
+$env:MYSQL_PASSWORD="TU_PASSWORD"
 ```
 
 En otra terminal ejecuta el backend principal FastAPI:
@@ -143,6 +143,8 @@ Si se desea probar tambien el backend Spring Boot alternativo:
 cd backend-springboot
 mvn spring-boot:run
 ```
+
+Para Spring Boot alternativo, las variables equivalentes son `SPRING_DATASOURCE_USERNAME` y `SPRING_DATASOURCE_PASSWORD`.
 
 En otra terminal ejecuta el frontend:
 
