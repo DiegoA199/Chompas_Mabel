@@ -154,13 +154,13 @@ Password: root
 
 Si se ejecuta con Docker, el servicio FastAPI usa el host interno `mysql`.
 
-La configuracion del backend Spring Boot alternativo esta en:
+La configuracion del backend esta en:
 
 ```text
-backend-springboot/src/main/resources/application.yml
+backend-fastapi/app/core/config.py
 ```
 
-Si MySQL usa otra contrasena, antes de correr el backend FastAPI se debe configurar:
+Si MySQL usa otra contrasena, antes de correr el backend se debe configurar:
 
 ```powershell
 $env:MYSQL_USER="root"
@@ -174,23 +174,14 @@ $env:MYSQL_USER="root"
 $env:MYSQL_PASSWORD=""
 ```
 
-Para el backend Spring Boot alternativo se usan `SPRING_DATASOURCE_USERNAME` y `SPRING_DATASOURCE_PASSWORD`.
-
 ## Paso 5: Ejecutar backend y frontend
 
-Backend principal FastAPI:
+Backend FastAPI:
 
 ```bash
 cd backend-fastapi
 pip install -r requirements.txt
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-
-Backend Spring Boot alternativo:
-
-```bash
-cd backend-springboot
-mvn spring-boot:run
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 Frontend:

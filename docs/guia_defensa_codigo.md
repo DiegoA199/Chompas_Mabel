@@ -6,7 +6,7 @@ Esta guia sirve para responder si el docente senala una linea especifica del pro
 
 Si preguntan si conoces el codigo, responde:
 
-> Si, conozco la estructura y puedo explicar cada archivo por responsabilidades. En Angular estan las rutas, componentes, formularios y servicios HTTP. En FastAPI estan los endpoints, validaciones y conexion a MySQL. En `database/schema.sql` estan las tablas, relaciones, datos iniciales y procedimientos almacenados.
+> Si, conozco la estructura y puedo explicar cada archivo por responsabilidades. En Angular estan las rutas, componentes, formularios y servicios HTTP. En FastAPI el backend esta separado en routers, services, core y schemas. En `database/schema.sql` estan las tablas, relaciones, datos iniciales y procedimientos almacenados.
 
 ## Frontend Angular
 
@@ -88,42 +88,54 @@ Respuesta:
 
 ## Backend FastAPI
 
-### `backend-fastapi/main.py`
+### Estructura por capas
 
-- Lineas 1 a 9: importan librerias para sistema, fechas, decimales, MySQL, FastAPI, CORS y validaciones.
-- Linea 12: crea la aplicacion FastAPI.
-- Lineas 14 a 20: configuran CORS para permitir que Angular consuma el backend desde localhost.
-- Lineas 23 a 30: leen la configuracion de MySQL desde variables de entorno.
-- Lineas 33 y 34: abren conexion a MySQL.
-- Lineas 37 a 53: convierten nombres y valores de MySQL a formato JSON usable por Angular.
-- Lineas 56 a 63: ejecutan consultas que devuelven varias filas.
-- Lineas 66 a 68: devuelven una sola fila.
-- Lineas 71 a 80: ejecutan procedimientos almacenados.
-- Lineas 91 a 129: definen modelos de entrada para login, productos, clientes y pedidos.
+- `app/main.py`: crea la aplicacion FastAPI, configura CORS e incluye los routers.
+- `routers`: define rutas REST por modulo y recibe las peticiones HTTP desde Angular.
+- `services`: concentra reglas de negocio, calculos, transacciones y consultas.
+- `core`: conecta con MySQL, lee variables de entorno y convierte datos a JSON.
+- `schemas.py`: define modelos Pydantic para validar los datos de entrada.
+- `main.py`: archivo minimo de compatibilidad para ejecutar `uvicorn main:app`.
 
-Respuesta si preguntan por modelos Pydantic:
+Respuesta si preguntan por la division:
 
-> Estos modelos validan los datos antes de llegar a la base de datos. Por ejemplo, un producto no puede tener precio negativo y un cliente debe tener correo valido.
+> El backend esta separado por responsabilidades para que no todo quede en un solo archivo. El router recibe la peticion, el service aplica la regla de negocio, core maneja base de datos y schemas valida la entrada.
 
-### Endpoints principales
+### Routers principales
 
-- Lineas 195 a 212: login. Busca usuario por correo y password; si no existe devuelve 401.
-- Lineas 215 a 217: lista productos usando `sp_listar_productos`.
-- Lineas 220 a 260: crea producto, resuelve categoria y registra stock inicial.
-- Lineas 262 a 298: actualiza producto existente.
-- Lineas 300 a 312: elimina producto.
-- Lineas 314 a 316: lista clientes.
-- Lineas 319 a 345: crea cliente.
-- Lineas 347 a 350: lista pedidos.
-- Lineas 376 a 478: crea pedido, calcula total, descuenta stock, genera venta si corresponde y registra movimiento de inventario.
-- Lineas 480 a 502: marca un credito como pagado.
-- Lineas 504 a 506: lista ventas cerradas.
-- Lineas 509 a 512: lista movimientos de inventario, con filtro opcional por producto.
-- Lineas 514 a 516: devuelve resumen de reportes.
+- `routers/auth.py`: expone `POST /api/auth/login`.
+- `routers/productos.py`: lista, crea, actualiza y elimina productos.
+- `routers/clientes.py`: lista y registra clientes.
+- `routers/pedidos.py`: lista pedidos, crea pedidos y marca creditos como pagados.
+- `routers/ventas.py`: lista ventas cerradas.
+- `routers/inventario.py`: lista movimientos de inventario con filtro opcional por producto.
+- `routers/reportes.py`: expone `GET /api/reportes/resumen` con indicadores administrativos.
 
 Respuesta:
 
-> Los endpoints son la entrada del backend. Cada endpoint representa una operacion del negocio: autenticar, listar, crear, actualizar, registrar pedido, pagar credito o consultar reportes.
+> Los routers son la entrada del backend. Cada funcion representa una operacion del negocio y delega la logica al servicio correspondiente.
+
+### Servicios principales
+
+- `producto_service.py`: resuelve categoria, calcula estado de stock y guarda productos.
+- `pedido_service.py`: valida cliente y usuario, calcula total, descuenta stock, registra movimiento de inventario, genera venta y controla credito.
+- `cliente_service.py`: limpia datos y registra clientes.
+- `reporte_service.py`: obtiene el resumen de reportes desde MySQL.
+
+Respuesta:
+
+> Los servicios contienen la logica importante del negocio. Por ejemplo, al crear un pedido, no solo se guarda una fila: tambien se valida stock, se descuenta inventario, se calcula credito y se genera venta si corresponde.
+
+### Core y schemas
+
+- `core/config.py`: lee `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_DATABASE`, `MYSQL_USER` y `MYSQL_PASSWORD`.
+- `core/database.py`: abre conexion, ejecuta consultas y llama procedimientos almacenados.
+- `core/serialization.py`: convierte fechas, decimales y nombres de columnas a JSON para Angular.
+- `schemas.py`: contiene `LoginRequest`, `ProductoPayload`, `ClientePayload` y `PedidoPayload`.
+
+Respuesta si preguntan por validaciones:
+
+> Las validaciones estan en `schemas.py` con Pydantic, por ejemplo `EmailStr`, `Field(min_length=...)`, `Field(ge=0)` y `Field(gt=0)`. Asi se evita guardar datos incompletos o incorrectos.
 
 ## Base de datos
 
@@ -161,10 +173,10 @@ Respuesta:
 4. Si apunta un `http.get`, `http.post` o `http.patch`:
    > Es una llamada al backend. `GET` consulta, `POST` registra y `PATCH` actualiza parcialmente.
 
-5. Si apunta un `@app.get` o `@app.post`:
-   > Es una ruta del backend. Define que operacion se ejecuta cuando el frontend llama a esa URL.
+5. Si apunta un `@router.get`, `@router.post`, `@router.put`, `@router.patch` o `@router.delete`:
+   > Es una ruta REST del backend FastAPI. Define que operacion se ejecuta cuando el frontend llama a esa URL.
 
-6. Si apunta un `Field(...)` en FastAPI:
+6. Si apunta un `Field(...)` o `EmailStr`:
    > Es una validacion de entrada. Evita guardar datos incorrectos.
 
 7. Si apunta un `FOREIGN KEY`:

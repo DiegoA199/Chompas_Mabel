@@ -1,0 +1,15 @@
+.git
+.gitignore
+README.md
+docs/entregables/
+docs/imagenes/
+frontend-angular/node_modules/
+frontend-angular/dist/
+frontend-angular/.angular/
+frontend-angular/.cache/
+backend-fastapi/.venv/
+backend-fastapi/venv/
+__pycache__/
+*.pyc
+*.log
+mysql-data/

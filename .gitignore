@@ -17,9 +17,11 @@ frontend-angular/dist/
 frontend-angular/.angular/
 frontend-angular/.cache/
 
-# Backend Spring Boot / Maven
-backend-springboot/target/
-backend-springboot/.mvn/wrapper/maven-wrapper.jar
+# Backend Python / FastAPI
+__pycache__/
+*.py[cod]
+backend-fastapi/.venv/
+backend-fastapi/venv/
 
 # Variables locales
 .env

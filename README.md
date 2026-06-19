@@ -5,10 +5,9 @@ Sistema web para administrar una empresa de chompas: login, dashboard, productos
 ## Tecnologias
 
 - Frontend: Angular 21, TypeScript, Bootstrap 5, Bootstrap Icons, CSS propio, routing, servicios HTTP, formularios reactivos y signals para estados de interfaz.
-- Backend principal: FastAPI, Uvicorn, MySQL Connector, endpoints REST y procedimientos almacenados.
-- Backend alternativo: Java 21, Spring Boot 3, Spring Web, Spring Data JPA, Spring Security, Hibernate, validaciones con `jakarta.validation`, controladores REST, servicios, repositorios, DTOs y modelos JPA.
+- Backend: FastAPI, Uvicorn, Pydantic, MySQL Connector, endpoints REST y procedimientos almacenados.
 - Base de datos: MySQL 8.4 con script reproducible en `database/schema.sql`, relaciones, restricciones y procedimientos almacenados.
-- Docker: `docker-compose.yml` levanta MySQL, backend FastAPI y tambien puede construir el backend Spring Boot.
+- Docker: `docker-compose.yml` levanta MySQL y el backend FastAPI.
 
 ## Estructura final
 
@@ -19,72 +18,60 @@ Chompas_Mabel_Real_Angular_SpringBoot/
 |   |   |-- app/
 |   |   |   |-- core/
 |   |   |   |   |-- models/
-|   |   |   |   |   |-- cliente.model.ts
-|   |   |   |   |   |-- pedido.model.ts
-|   |   |   |   |   +-- producto.model.ts
 |   |   |   |   +-- services/
-|   |   |   |       |-- auth.interceptor.ts
-|   |   |   |       |-- auth.service.ts
-|   |   |   |       |-- cliente.service.ts
-|   |   |   |       |-- environment.ts
-|   |   |   |       |-- pedido.service.ts
-|   |   |   |       +-- producto.service.ts
 |   |   |   |-- features/
-|   |   |   |   |-- auth/login.component.ts
-|   |   |   |   |-- clientes/clientes.component.ts
-|   |   |   |   |-- dashboard/dashboard.component.ts
-|   |   |   |   |-- creditos/creditos.component.ts
-|   |   |   |   |-- inventario/inventario.component.ts
-|   |   |   |   |-- pedidos/pedidos.component.ts
-|   |   |   |   |-- productos/productos.component.ts
-|   |   |   |   |-- reportes/reportes.component.ts
-|   |   |   |   +-- ventas/ventas.component.ts
-|   |   |   |-- layout/layout.component.ts
+|   |   |   |   |-- auth/
+|   |   |   |   |-- clientes/
+|   |   |   |   |-- creditos/
+|   |   |   |   |-- dashboard/
+|   |   |   |   |-- inventario/
+|   |   |   |   |-- pedidos/
+|   |   |   |   |-- productos/
+|   |   |   |   |-- reportes/
+|   |   |   |   +-- ventas/
+|   |   |   |-- layout/
 |   |   |   |-- app.component.ts
 |   |   |   +-- app.routes.ts
-|   |   |-- assets/logo.svg
+|   |   |-- assets/
 |   |   |-- index.html
 |   |   |-- main.ts
 |   |   +-- styles.css
 |   |-- angular.json
 |   |-- package.json
-|   |-- package-lock.json
-|   |-- tsconfig.json
-|   +-- README.md
-|-- backend-springboot/
-|   |-- src/main/java/pe/edu/continental/chompasmabel/
-|   |   |-- config/
-|   |   |-- controller/
-|   |   |-- dto/
-|   |   |-- model/
-|   |   |-- repository/
-|   |   |-- service/
-|   |   +-- ChompasMabelApiApplication.java
-|   |-- src/main/resources/
-|   |   |-- application.yml
-|   |   +-- data.sql
-|   |-- Dockerfile
-|   |-- pom.xml
 |   +-- README.md
 |-- backend-fastapi/
+|   |-- app/
+|   |   |-- core/
+|   |   |   |-- config.py
+|   |   |   |-- database.py
+|   |   |   +-- serialization.py
+|   |   |-- routers/
+|   |   |-- services/
+|   |   |-- main.py
+|   |   +-- schemas.py
 |   |-- main.py
-|   |-- requirements.txt
 |   |-- Dockerfile
+|   |-- requirements.txt
 |   +-- README.md
-|-- database/schema.sql
+|-- database/
+|   +-- schema.sql
 |-- docs/
-|   |-- entregables/
-|   |-- replicar_base_datos.md
-|   |-- requerimientos_usuario.md
-|   +-- imagenes/
 |-- docker-compose.yml
 +-- README.md
 ```
 
+## Estructura del backend segun la rubrica
+
+- `app/main.py`: crea la aplicacion FastAPI, configura CORS e incluye routers.
+- `routers`: define rutas REST por modulo (`auth`, `productos`, `clientes`, `pedidos`, `ventas`, `inventario`, `reportes`).
+- `services`: contiene reglas de negocio y operaciones sobre MySQL.
+- `core`: centraliza configuracion, conexion a base de datos y conversion de filas a JSON.
+- `schemas.py`: contiene modelos Pydantic para validar datos de entrada.
+- `main.py`: archivo minimo de compatibilidad para ejecutar `uvicorn main:app`.
+
 ## Requisitos
 
 - Python 3.12+
-- Java 21 y Maven 3.9+ si se desea ejecutar tambien el backend Spring Boot alternativo
 - Node.js 22+
 - npm
 - MySQL 8.x instalado localmente o Docker Desktop
@@ -103,13 +90,9 @@ La base creada es `chompas_mabel_db` y se inicializa con `database/schema.sql`.
 
 ### Opcion B: Base de datos con MySQL local
 
-Si Docker demora o no sincroniza bien, instala MySQL Server o usa MySQL Workbench/XAMPP e importa el script completo:
-
 ```bash
 mysql -u root -p < database/schema.sql
 ```
-
-En MySQL Workbench tambien puedes abrir `database/schema.sql` y ejecutarlo con el boton de rayo. En XAMPP/phpMyAdmin puedes entrar a `http://localhost/phpmyadmin` e importar el mismo archivo.
 
 El backend usa por defecto:
 
@@ -120,31 +103,22 @@ Password: root
 Puerto: 3306
 ```
 
-Si tu MySQL tiene otra contrasena, configura las variables antes de correr el backend:
+Si tu MySQL tiene otra contrasena:
 
 ```powershell
 $env:MYSQL_USER="root"
 $env:MYSQL_PASSWORD="TU_PASSWORD"
 ```
 
-En otra terminal ejecuta el backend principal FastAPI:
+Ejecuta el backend FastAPI:
 
 ```bash
 cd backend-fastapi
 pip install -r requirements.txt
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-El frontend consume por defecto `http://localhost:8000/api`.
-
-Si se desea probar tambien el backend Spring Boot alternativo:
-
-```bash
-cd backend-springboot
-mvn spring-boot:run
-```
-
-Para Spring Boot alternativo, las variables equivalentes son `SPRING_DATASOURCE_USERNAME` y `SPRING_DATASOURCE_PASSWORD`.
+La API queda disponible en `http://localhost:8000/api`.
 
 En otra terminal ejecuta el frontend:
 
@@ -156,27 +130,22 @@ npm start
 
 Abrir: `http://localhost:4200`
 
+El frontend consume por defecto `http://localhost:8000/api`.
+
 ## Ejecucion con Docker
 
-Para levantar MySQL, FastAPI y Spring Boot:
+Para levantar MySQL y FastAPI:
 
 ```bash
 docker compose up --build
 ```
 
-FastAPI queda en `http://localhost:8000`, Spring Boot en `http://localhost:8080` y el frontend se ejecuta con Angular CLI desde `frontend-angular`.
+FastAPI queda en `http://localhost:8000` y el frontend se ejecuta con Angular CLI desde `frontend-angular`.
 
 ## Credenciales demo
 
 - Administrador: `admin@chompasmabel.com` / `admin123`
 - Vendedor: `vendedor@chompasmabel.com` / `venta123`
-
-## Flujo por rol
-
-- Administrador: dashboard administrativo, mantenimiento de productos, inventario, clientes, pedidos, ventas, creditos, reportes y notificaciones de stock bajo.
-- Vendedor: dashboard operativo, catalogo visual de chompas para atencion al cliente, registro de clientes, pedidos, ventas, creditos y notificaciones de pedidos/creditos.
-
-Los requerimientos de usuario estan documentados en `docs/requerimientos_usuario.md`.
 
 ## API principal
 
@@ -194,62 +163,16 @@ Los requerimientos de usuario estan documentados en `docs/requerimientos_usuario
 - `GET http://localhost:8000/api/inventario/movimientos`
 - `GET http://localhost:8000/api/reportes/resumen`
 
-## Modelo de datos
-
-- Categoria 1 a N Productos
-- Cliente 1 a N Pedidos
-- Usuario 1 a N Pedidos
-- Pedido 1 a N DetallePedido
-- Producto 1 a N DetallePedido
-- Producto 1 a N InventarioMovimiento
-- Pedido 1 a 1 Venta
-
-Las tablas reales del script son `usuarios`, `clientes`, `categorias`, `productos`, `pedidos`, `detalle_pedido`, `ventas` e `inventario_movimientos`.
-
-La tabla `pedidos` tambien guarda datos de credito: `monto_pagado`, `saldo_pendiente`, `fecha_vencimiento_credito` y `estado_credito`. Con eso se puede saber que cliente llevo productos a credito, cuanto debe, cuando vence y si el saldo ya fue pagado.
-
-El script completo de base de datos esta en `database/schema.sql` e incluye datos iniciales y procedimientos almacenados para probar administrador, vendedor, productos, clientes, pedidos, ventas, inventario, reportes y creditos.
-
-La guia completa para crear, importar y verificar la base en otra PC esta en `docs/replicar_base_datos.md`.
-
-## Replicar en otra PC
-
-El enlace del repositorio se puede copiar desde GitHub o descargar usando GitHub Desktop.
-
-```bash
-git clone URL_DEL_REPOSITORIO
-cd Chompas_Mabel_Real_Angular_SpringBoot
-```
-
-Luego elige una forma de crear la base:
-
-Con Docker:
-
-```bash
-docker compose up -d mysql
-```
-
-Sin Docker, usando MySQL local:
-
-```bash
-mysql -u root -p < database/schema.sql
-```
-
-Despues ejecuta el backend y frontend con los comandos anteriores. No subas `node_modules`, `dist`, `target` ni datos locales de MySQL; `database/schema.sql` recrea toda la base con datos iniciales y `docker-compose.yml` queda como alternativa automatizada.
-
-Para pasos detallados con MySQL Workbench, XAMPP/phpMyAdmin, consola MySQL y Docker, revisar `docs/replicar_base_datos.md`.
-
 ## Notas de implementacion
 
-- El frontend consume el backend mediante servicios HTTP en `src/app/core/services`.
-- El backend principal FastAPI esta en `backend-fastapi` y expone los endpoints del sistema.
-- La pantalla de productos cambia segun rol: administrador edita catalogo/productos y vendedor ve un catalogo responsive con imagenes, filtros, tallas, colores, precios y stock.
-- La ruta `/inventario` usa un componente dedicado para movimientos de inventario y la ruta `/ventas` usa un componente dedicado para historial de ventas cerradas.
-- La barra de busqueda superior filtra en tiempo real productos, pedidos, clientes, creditos, ventas e inventario segun la vista activa.
-- Los formularios validan campos obligatorios, correo valido, precio y stock mayores o iguales a 0, cantidad mayor a 0 y nombre minimo de 3 caracteres.
-- FastAPI valida payloads con Pydantic; el backend Spring Boot alternativo valida con `jakarta.validation` y responde errores JSON desde `ApiExceptionHandler`.
-- Al registrar un pedido, el backend calcula subtotales, total, descuenta stock, registra movimientos de inventario y genera venta cuando el estado corresponde.
+- El proyecto conserva un solo backend: `backend-fastapi`.
+- El backend ya no esta en un unico archivo grande; esta dividido en routers, servicios, core y schemas.
+- Para Render existe un `Dockerfile` en la raiz que construye Angular y FastAPI en un solo Web Service.
+- En produccion Angular llama a la API con el mismo dominio usando `/api`.
+- Al registrar un pedido, el backend calcula subtotales, total, descuenta stock, registra movimientos de inventario y genera venta cuando corresponde.
 - Si el metodo de pago es `Credito`, el backend calcula saldo pendiente, fecha de vencimiento y estado `PENDIENTE`, `VENCIDO` o `PAGADO`.
-- La campana de notificaciones calcula alertas reales segun creditos vencidos, pedidos pendientes y stock bajo.
-- El interceptor HTTP limpia sesion y redirige al login si el backend responde `401`.
 - La base de datos incluye procedimientos `sp_listar_productos`, `sp_listar_clientes`, `sp_listar_pedidos`, `sp_listar_detalles_pedido`, `sp_listar_ventas`, `sp_listar_movimientos_inventario` y `sp_resumen_reportes`.
+
+La guia completa para crear, importar y verificar la base en otra PC esta en `docs/replicar_base_datos.md`.
+La guia de estudio del codigo esta en `docs/guia_estudio_codigo.md`.
+La guia de despliegue en Render esta en `docs/despliegue_render.md`.

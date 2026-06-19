@@ -42,9 +42,7 @@ Abrir `http://localhost:4200`.
 
 ## Conexion API
 
-Los servicios HTTP estan en `src/app/core/services` y consumen por defecto el backend FastAPI en `http://localhost:8000/api`.
-
-El backend Spring Boot queda como alternativa compatible en `http://localhost:8080/api` si se cambia `src/app/core/services/environment.ts`.
+Los servicios HTTP estan en `src/app/core/services`. En desarrollo consumen el backend FastAPI en `http://localhost:8000/api`; en produccion usan el mismo dominio publicado y agregan `/api`.
 
 El modulo de creditos usa `PedidoService` para listar pedidos a credito, mostrar saldos vencidos y marcar una cuenta como pagada.
 
