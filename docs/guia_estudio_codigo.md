@@ -25,8 +25,13 @@ Contiene la aplicacion Angular.
 
 - `src/app/core/models`: interfaces TypeScript que describen los datos del sistema.
 - `src/app/core/services`: servicios que llaman al backend y guardan estado.
-- `src/app/features`: pantallas principales del sistema.
-- `src/app/layout`: estructura comun de navegacion.
+- `src/app/core/interceptors`: interceptores HTTP, como el token de sesion.
+- `src/app/core/guards`: reglas de acceso por rol.
+- `src/app/core/config`: configuracion de URL del backend.
+- `src/app/shared`: espacio para componentes, pipes y directivas reutilizables.
+- `src/app/features`: pantallas principales del sistema. Cada feature separa `.component.ts`, `.component.html`, `.component.css` y `.routes.ts`.
+- `src/app/layout`: estructura comun de navegacion separada en TS, HTML y CSS.
+- `src/app/app.config.ts`: providers globales de router y HTTP.
 - `src/app/app.routes.ts`: rutas y permisos por rol.
 - `src/styles.css`: estilos globales.
 
@@ -309,7 +314,7 @@ Define las rutas:
 
 Tambien define permisos por rol.
 
-### `src/app/core/services/environment.ts`
+### `src/app/core/config/environment.ts`
 
 Define la URL del backend.
 
@@ -332,7 +337,7 @@ https://tu-dominio.com/api
 - Expone `isAdmin` e `isVendedor`.
 - Cierra sesion.
 
-### `auth.interceptor.ts`
+### `core/interceptors/auth.interceptor.ts`
 
 - Agrega token a las peticiones.
 - Si el backend devuelve `401`, limpia sesion.

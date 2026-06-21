@@ -1,28 +1,18 @@
 import { Routes } from '@angular/router';
 import { LayoutComponent } from './layout/layout.component';
-import { LoginComponent } from './features/auth/login.component';
-import { DashboardComponent } from './features/dashboard/dashboard.component';
-import { ProductosComponent } from './features/productos/productos.component';
-import { PedidosComponent } from './features/pedidos/pedidos.component';
-import { ClientesComponent } from './features/clientes/clientes.component';
-import { ReportesComponent } from './features/reportes/reportes.component';
-import { CreditosComponent } from './features/creditos/creditos.component';
-import { InventarioComponent } from './features/inventario/inventario.component';
-import { VentasComponent } from './features/ventas/ventas.component';
-import { roleGuard } from './core/services/role.guard';
 
 export const routes: Routes = [
-  {path:'login', component: LoginComponent},
+  {path:'login', loadChildren: () => import('./features/auth/auth.routes').then(m => m.AUTH_ROUTES)},
   {path:'', component: LayoutComponent, children:[
     {path:'', redirectTo:'dashboard', pathMatch:'full'},
-    {path:'dashboard', component: DashboardComponent},
-    {path:'productos', component: ProductosComponent},
-    {path:'inventario', component: InventarioComponent, canActivate:[roleGuard], data:{roles:['ADMIN']}},
-    {path:'pedidos', component: PedidosComponent},
-    {path:'clientes', component: ClientesComponent},
-    {path:'ventas', component: VentasComponent},
-    {path:'creditos', component: CreditosComponent},
-    {path:'reportes', component: ReportesComponent, canActivate:[roleGuard], data:{roles:['ADMIN']}}
+    {path:'dashboard', loadChildren: () => import('./features/dashboard/dashboard.routes').then(m => m.DASHBOARD_ROUTES)},
+    {path:'productos', loadChildren: () => import('./features/productos/productos.routes').then(m => m.PRODUCTOS_ROUTES)},
+    {path:'inventario', loadChildren: () => import('./features/inventario/inventario.routes').then(m => m.INVENTARIO_ROUTES)},
+    {path:'pedidos', loadChildren: () => import('./features/pedidos/pedidos.routes').then(m => m.PEDIDOS_ROUTES)},
+    {path:'clientes', loadChildren: () => import('./features/clientes/clientes.routes').then(m => m.CLIENTES_ROUTES)},
+    {path:'ventas', loadChildren: () => import('./features/ventas/ventas.routes').then(m => m.VENTAS_ROUTES)},
+    {path:'creditos', loadChildren: () => import('./features/creditos/creditos.routes').then(m => m.CREDITOS_ROUTES)},
+    {path:'reportes', loadChildren: () => import('./features/reportes/reportes.routes').then(m => m.REPORTES_ROUTES)}
   ]},
   {path:'**', redirectTo:'dashboard'}
 ];

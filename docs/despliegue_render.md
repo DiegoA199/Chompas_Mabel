@@ -24,7 +24,7 @@ https://tudominio.com/api/...  -> FastAPI
 - `render.yaml`: Blueprint para crear el Web Service en Render.
 - `.dockerignore`: evita subir archivos innecesarios al build.
 - `backend-fastapi/app/main.py`: sirve API y frontend.
-- `frontend-angular/src/app/core/services/environment.ts`: usa `localhost:8000` en local y `/api` en produccion.
+- `frontend-angular/src/app/core/config/environment.ts`: usa `localhost:8000` en local y `/api` en produccion.
 
 ## Base de datos MySQL
 

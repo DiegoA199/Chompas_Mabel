@@ -2,7 +2,7 @@ import { Injectable, computed, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { Cliente, ClientePayload } from '../models/cliente.model';
-import { environment } from './environment';
+import { environment } from '../config/environment';
 
 @Injectable({providedIn:'root'})
 export class ClienteService {

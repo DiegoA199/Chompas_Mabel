@@ -2,7 +2,7 @@ import { Injectable, computed, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { Pedido, PedidoPayload } from '../models/pedido.model';
-import { environment } from './environment';
+import { environment } from '../config/environment';
 
 @Injectable({providedIn:'root'})
 export class PedidoService {

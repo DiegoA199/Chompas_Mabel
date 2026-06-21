@@ -13,23 +13,34 @@ El frontend separa el flujo por rol:
 src/app/
 |-- core/
 |   |-- models/
-|   +-- services/
+|   |-- services/
+|   |-- interceptors/
+|   |-- guards/
+|   +-- config/
+|-- shared/
+|   |-- components/
+|   |-- pipes/
+|   +-- directives/
 |-- features/
 |   |-- auth/
-|   |-- clientes/
-|   |-- creditos/
-|   |-- dashboard/
-|   |-- inventario/
-|   |-- pedidos/
-|   |-- productos/
-|   |-- reportes/
-|   +-- ventas/
+|   |   |-- login.component.ts
+|   |   |-- login.component.html
+|   |   |-- login.component.css
+|   |   +-- auth.routes.ts
+|   +-- productos/
+|       |-- productos.component.ts
+|       |-- productos.component.html
+|       |-- productos.component.css
+|       +-- productos.routes.ts
 |-- layout/
 |-- app.component.ts
+|-- app.component.html
+|-- app.component.css
+|-- app.config.ts
 +-- app.routes.ts
 ```
 
-Los componentes son standalone y usan plantillas embebidas en sus archivos `.component.ts`. Los estilos globales estan en `src/styles.css`.
+Los componentes son standalone y separan logica, plantilla y estilos en archivos `.component.ts`, `.component.html` y `.component.css`. Cada feature tiene su archivo `.routes.ts`. Los estilos globales estan en `src/styles.css`.
 
 ## Comandos
 

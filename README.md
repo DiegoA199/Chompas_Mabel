@@ -18,7 +18,14 @@ Chompas_Mabel_Real_Angular_SpringBoot/
 |   |   |-- app/
 |   |   |   |-- core/
 |   |   |   |   |-- models/
-|   |   |   |   +-- services/
+|   |   |   |   |-- services/
+|   |   |   |   |-- interceptors/
+|   |   |   |   |-- guards/
+|   |   |   |   +-- config/
+|   |   |   |-- shared/
+|   |   |   |   |-- components/
+|   |   |   |   |-- pipes/
+|   |   |   |   +-- directives/
 |   |   |   |-- features/
 |   |   |   |   |-- auth/
 |   |   |   |   |-- clientes/
@@ -31,6 +38,9 @@ Chompas_Mabel_Real_Angular_SpringBoot/
 |   |   |   |   +-- ventas/
 |   |   |   |-- layout/
 |   |   |   |-- app.component.ts
+|   |   |   |-- app.component.html
+|   |   |   |-- app.component.css
+|   |   |   |-- app.config.ts
 |   |   |   +-- app.routes.ts
 |   |   |-- assets/
 |   |   |-- index.html
@@ -68,6 +78,17 @@ Chompas_Mabel_Real_Angular_SpringBoot/
 - `core`: centraliza configuracion, conexion a base de datos y conversion de filas a JSON.
 - `schemas.py`: contiene modelos Pydantic para validar datos de entrada.
 - `main.py`: archivo minimo de compatibilidad para ejecutar `uvicorn main:app`.
+
+## Estructura del frontend segun la rubrica
+
+- `core/models`: interfaces TypeScript.
+- `core/services`: logica de negocio y llamadas HTTP.
+- `core/interceptors`: interceptor HTTP de autenticacion.
+- `core/guards`: guards de rutas por rol.
+- `core/config`: configuracion de API.
+- `shared`: espacio para componentes, pipes y directivas reutilizables.
+- `layout`: sidebar, topbar y cascaron visual.
+- `features`: cada pantalla tiene `.component.ts`, `.component.html`, `.component.css` y `.routes.ts`.
 
 ## Requisitos
 

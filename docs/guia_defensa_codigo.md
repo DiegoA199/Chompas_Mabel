@@ -40,7 +40,7 @@ Respuesta si preguntan por `signal` o `computed`:
 
 > `signal` guarda estado reactivo y `computed` calcula valores derivados. Por ejemplo, `isAdmin` depende del rol guardado y se actualiza cuando cambia la sesion.
 
-### `frontend-angular/src/app/core/services/auth.interceptor.ts`
+### `frontend-angular/src/app/core/interceptors/auth.interceptor.ts`
 
 - Lineas 6 a 9: interceptan cada peticion HTTP y agregan el token en el encabezado Authorization.
 - Lineas 11 a 18: controlan errores HTTP.
@@ -85,6 +85,10 @@ Respuesta:
 Respuesta:
 
 > Los componentes se encargan de la vista y de llamar a los servicios. La logica compartida se mantiene en servicios para no duplicarla.
+
+Respuesta si preguntan por los archivos `.html`, `.css` y `.routes.ts`:
+
+> Cada feature esta separada para cumplir responsabilidades: `.component.ts` tiene la logica, `.component.html` la plantilla, `.component.css` los estilos del modulo y `.routes.ts` la ruta lazy de esa pantalla.
 
 ## Backend FastAPI
 

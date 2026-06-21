@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { forkJoin } from 'rxjs';
 import { Pedido } from '../models/pedido.model';
 import { Producto } from '../models/producto.model';
-import { environment } from './environment';
+import { environment } from '../config/environment';
 
 @Injectable({providedIn:'root'})
 export class ReportesService {
