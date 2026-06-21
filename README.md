@@ -8,6 +8,7 @@ Sistema web para administrar una empresa de chompas: login, dashboard, productos
 - Backend: FastAPI, Uvicorn, Pydantic, MySQL Connector, endpoints REST y procedimientos almacenados.
 - Base de datos: MySQL 8.4 con script reproducible en `database/schema.sql`, relaciones, restricciones y procedimientos almacenados.
 - Docker: `docker-compose.yml` levanta MySQL y el backend FastAPI.
+- Despliegue cloud: preparado para Render y para Firebase Hosting + Cloud Run + Cloud SQL MySQL.
 
 ## Estructura final
 
@@ -189,6 +190,7 @@ FastAPI queda en `http://localhost:8000` y el frontend se ejecuta con Angular CL
 - El proyecto conserva un solo backend: `backend-fastapi`.
 - El backend ya no esta en un unico archivo grande; esta dividido en routers, servicios, core y schemas.
 - Para Render existe un `Dockerfile` en la raiz que construye Angular y FastAPI en un solo Web Service.
+- Para Firebase existe `firebase.json`, que envia el dominio de Firebase Hosting al servicio Cloud Run `chompas-mabel`.
 - En produccion Angular llama a la API con el mismo dominio usando `/api`.
 - Al registrar un pedido, el backend calcula subtotales, total, descuenta stock, registra movimientos de inventario y genera venta cuando corresponde.
 - Si el metodo de pago es `Credito`, el backend calcula saldo pendiente, fecha de vencimiento y estado `PENDIENTE`, `VENCIDO` o `PAGADO`.
@@ -197,3 +199,4 @@ FastAPI queda en `http://localhost:8000` y el frontend se ejecuta con Angular CL
 La guia completa para crear, importar y verificar la base en otra PC esta en `docs/replicar_base_datos.md`.
 La guia de estudio del codigo esta en `docs/guia_estudio_codigo.md`.
 La guia de despliegue en Render esta en `docs/despliegue_render.md`.
+La guia de despliegue en Firebase + Cloud Run + Cloud SQL esta en `docs/despliegue_firebase_cloud_run.md`.

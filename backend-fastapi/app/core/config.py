@@ -15,10 +15,19 @@ def db_config() -> dict[str, Any]:
             "password": unquote(parsed.password or ""),
         }
 
-    return {
+    config = {
         "host": os.getenv("MYSQL_HOST", "localhost"),
         "port": int(os.getenv("MYSQL_PORT", "3306")),
         "database": os.getenv("MYSQL_DATABASE", "chompas_mabel_db"),
         "user": os.getenv("MYSQL_USER", "root"),
         "password": os.getenv("MYSQL_PASSWORD", "root"),
     }
+
+    unix_socket = os.getenv("MYSQL_UNIX_SOCKET")
+    instance_connection_name = os.getenv("MYSQL_INSTANCE_CONNECTION_NAME")
+    if unix_socket or instance_connection_name:
+        config.pop("host", None)
+        config.pop("port", None)
+        config["unix_socket"] = unix_socket or f"/cloudsql/{instance_connection_name}"
+
+    return config
