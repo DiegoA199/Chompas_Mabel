@@ -7,13 +7,16 @@ import { BusquedaService } from '../../core/services/busqueda.service';
 import { ClienteService } from '../../core/services/cliente.service';
 import { PedidoService } from '../../core/services/pedido.service';
 import { ProductoService } from '../../core/services/producto.service';
+import { TablePaginationComponent } from '../../shared/components/table-pagination/table-pagination.component';
 
-@Component({selector:'app-pedidos',standalone:true,imports:[ReactiveFormsModule,CurrencyPipe,DatePipe],templateUrl: './pedidos.component.html',
+@Component({selector:'app-pedidos',standalone:true,imports:[ReactiveFormsModule,CurrencyPipe,DatePipe,TablePaginationComponent],templateUrl: './pedidos.component.html',
   styleUrl: './pedidos.component.css'})
 export class PedidosComponent implements OnInit {
   estados: EstadoPedido[] = ['PENDIENTE', 'CONFIRMADO', 'EN_PROCESO', 'ENTREGADO', 'VENDIDO', 'CANCELADO'];
   guardando = signal(false);
   errorFormulario = signal('');
+  pagina = signal(1);
+  tamanoPagina = signal(5);
 
   form = this.fb.group({
     clienteId: [0, [Validators.required, Validators.min(1)]],
@@ -63,6 +66,7 @@ export class PedidosComponent implements OnInit {
       next: () => {
         this.productos.cargarDesdeApi();
         this.form.reset({clienteId:0, productoId:0, cantidad:1, metodoPago:'Yape', montoPagado:0, fechaVencimientoCredito:'', estado:'CONFIRMADO'});
+        this.pagina.set(1);
       },
       error: () => this.errorFormulario.set('No se pudo registrar el pedido. Revisa cliente, producto y stock disponible.'),
       complete: () => this.guardando.set(false)
@@ -95,5 +99,24 @@ export class PedidosComponent implements OnInit {
       pedido.saldoPendiente,
       pedido.detalles.map(detalle => detalle.producto).join(' ')
     ));
+  }
+
+  pedidosPaginados(): Pedido[] {
+    const pedidos = this.pedidosFiltrados();
+    const inicio = (this.paginaActual() - 1) * this.tamanoPagina();
+    return pedidos.slice(inicio, inicio + this.tamanoPagina());
+  }
+
+  actualizarPagina(pagina: number): void {
+    this.pagina.set(pagina);
+  }
+
+  actualizarTamanoPagina(tamano: number): void {
+    this.tamanoPagina.set(tamano);
+    this.pagina.set(1);
+  }
+
+  paginaActual(): number {
+    return Math.min(this.pagina(), Math.max(1, Math.ceil(this.pedidosFiltrados().length / this.tamanoPagina())));
   }
 }

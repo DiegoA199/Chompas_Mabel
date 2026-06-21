@@ -1,0 +1,30 @@
+.table-pagination {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.pagination-size-control {
+  align-items: center;
+  color: #6b7280;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.pagination-size-control .form-select {
+  width: 5rem;
+}
+
+.pagination-summary {
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.pagination-actions .btn {
+  min-width: 2.5rem;
+}

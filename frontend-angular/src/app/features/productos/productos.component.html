@@ -81,7 +81,7 @@
       <table class="table table-hover">
         <thead><tr><th>Codigo</th><th>Producto</th><th>Categoria</th><th>Talla</th><th>Color</th><th>Stock</th><th>Precio</th><th>Estado</th><th>Acciones</th></tr></thead>
         <tbody>
-          @for(p of productosFiltrados(); track p.id){
+          @for(p of productosPaginados(); track p.id){
             <tr>
               <td>{{p.codigo}}</td>
               <td><strong>{{p.nombre}}</strong><br><small class="text-muted">{{p.descripcion}}</small></td>
@@ -96,10 +96,18 @@
                 <button class="btn btn-sm btn-outline-danger" type="button" (click)="eliminar(p)"><i class="bi bi-trash"></i></button>
               </td>
             </tr>
+          } @empty {
+            <tr><td colspan="9" class="text-center text-muted py-4">No hay productos que coincidan con la busqueda.</td></tr>
           }
         </tbody>
       </table>
     </div>
+    <app-table-pagination
+      [totalItems]="productosFiltrados().length"
+      [page]="paginaActual()"
+      [pageSize]="tamanoPagina()"
+      (pageChange)="actualizarPagina($event)"
+      (pageSizeChange)="actualizarTamanoPagina($event)" />
   </div>
 } @else {
   <section class="catalog-banner mb-4">
@@ -128,7 +136,7 @@
   </div>
 
   <div class="catalog-grid">
-    @for(producto of productosFiltrados(); track producto.id){
+    @for(producto of productosPaginados(); track producto.id){
       <article class="catalog-card">
         <div class="catalog-image" [style.background-image]="imagenProducto(producto)">
           <span class="catalog-badge">{{producto.categoria}}</span>
@@ -157,4 +165,10 @@
       <div class="card-soft p-4 text-center text-muted">No hay productos que coincidan con la busqueda.</div>
     }
   </div>
+  <app-table-pagination
+    [totalItems]="productosFiltrados().length"
+    [page]="paginaActual()"
+    [pageSize]="tamanoPagina()"
+    (pageChange)="actualizarPagina($event)"
+    (pageSizeChange)="actualizarTamanoPagina($event)" />
 }

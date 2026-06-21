@@ -27,7 +27,7 @@
         <tr><th>Pedido</th><th>Cliente</th><th>Total</th><th>Pagado</th><th>Saldo</th><th>Vencimiento</th><th>Estado</th><th></th></tr>
       </thead>
       <tbody>
-        @for(credito of creditosFiltrados(); track credito.id){
+        @for(credito of creditosPaginados(); track credito.id){
           <tr>
             <td class="text-brand fw-bold">{{credito.numero}}</td>
             <td>{{credito.cliente}}</td>
@@ -56,4 +56,10 @@
       </tbody>
     </table>
   </div>
+  <app-table-pagination
+    [totalItems]="creditosFiltrados().length"
+    [page]="paginaActual()"
+    [pageSize]="tamanoPagina()"
+    (pageChange)="actualizarPagina($event)"
+    (pageSizeChange)="actualizarTamanoPagina($event)" />
 </div>

@@ -5,8 +5,9 @@ import { Producto, ProductoPayload } from '../../core/models/producto.model';
 import { AuthService } from '../../core/services/auth.service';
 import { BusquedaService } from '../../core/services/busqueda.service';
 import { ProductoService } from '../../core/services/producto.service';
+import { TablePaginationComponent } from '../../shared/components/table-pagination/table-pagination.component';
 
-@Component({selector:'app-productos',standalone:true,imports:[ReactiveFormsModule,CurrencyPipe],templateUrl: './productos.component.html',
+@Component({selector:'app-productos',standalone:true,imports:[ReactiveFormsModule,CurrencyPipe,TablePaginationComponent],templateUrl: './productos.component.html',
   styleUrl: './productos.component.css'})
 export class ProductosComponent implements OnInit {
   categorias = ['Clasicas', 'Juveniles', 'Cardigans', 'Alpaca', 'Corporativas'];
@@ -14,6 +15,8 @@ export class ProductosComponent implements OnInit {
   guardando = signal(false);
   errorFormulario = signal('');
   categoriaActiva = signal('Todas');
+  pagina = signal(1);
+  tamanoPagina = signal(5);
 
   form = this.fb.group({
     codigo: ['', [Validators.required, Validators.maxLength(30)]],
@@ -58,6 +61,7 @@ export class ProductosComponent implements OnInit {
       next: () => {
         this.form.reset({codigo:'', nombre:'', descripcion:'', categoria:'Clasicas', talla:'M', color:'Beige', precio:0, stock:0});
         this.editandoId.set(null);
+        this.pagina.set(1);
       },
       error: () => this.errorFormulario.set('No se pudo guardar el producto. Revisa codigo unico y datos obligatorios.'),
       complete: () => this.guardando.set(false)
@@ -95,10 +99,12 @@ export class ProductosComponent implements OnInit {
   buscar(evento: Event): void {
     const input = evento.target as HTMLInputElement;
     this.busqueda.actualizar(input.value);
+    this.pagina.set(1);
   }
 
   filtrarCategoria(categoria: string): void {
     this.categoriaActiva.set(categoria);
+    this.pagina.set(1);
   }
 
   categoriasCatalogo(): string[] {
@@ -120,6 +126,29 @@ export class ProductosComponent implements OnInit {
         producto.stock
       );
     });
+  }
+
+  productosPaginados(): Producto[] {
+    return this.paginar(this.productosFiltrados());
+  }
+
+  actualizarPagina(pagina: number): void {
+    this.pagina.set(pagina);
+  }
+
+  actualizarTamanoPagina(tamano: number): void {
+    this.tamanoPagina.set(tamano);
+    this.pagina.set(1);
+  }
+
+  paginaActual(): number {
+    return Math.min(this.pagina(), Math.max(1, Math.ceil(this.productosFiltrados().length / this.tamanoPagina())));
+  }
+
+  private paginar(items: Producto[]): Producto[] {
+    const pagina = this.paginaActual();
+    const inicio = (pagina - 1) * this.tamanoPagina();
+    return items.slice(inicio, inicio + this.tamanoPagina());
   }
 
   imagenProducto(producto: Producto): string {
